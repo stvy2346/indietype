@@ -2,6 +2,7 @@ import { useState } from 'react'
 import Header from './components/Header'
 import Timerorspeed from './components/Timerorspeed'
 import Restart from './components/Restart'
+import Gameboard from './components/Gameboard'
 
 function App() {
 
@@ -10,12 +11,11 @@ function App() {
   }
 
   return (
-    <main className="bg-zinc-900 min-h-screen flex flex-col items-center p-4">
+    <main className="bg-zinc-900 min-h-screen flex flex-col px-15 py-5">
       <Header/>
-      <div className='flex justify-between items-center w-full max-w-xl mt-4'>
-        <Timerorspeed/>
-        <Restart onRestart={handleRestart}/>
-      </div>
+      <Timerorspeed/>
+      <Gameboard/>
+      <Restart onRestart={handleRestart}/>
     </main>
   )
 }

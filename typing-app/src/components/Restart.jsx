@@ -4,9 +4,9 @@ const Restart = ({onRestart}) =>{
     return(
         <button  
             onClick={onRestart} 
-            className="rounded-md px-4 py-2 bg-zinc-700 text-zinc-500 hover:text-blue-500 active:bg-zinc-800"
+            className="m-10 text-3xl text-zinc-500 hover:text-blue-500"
         >
-            New Game
+            <i className="fa-solid fa-rotate-right"></i>
         </button>
     )
 }
