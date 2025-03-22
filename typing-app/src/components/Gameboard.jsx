@@ -1,32 +1,78 @@
-import {useEffect } from "react";
+import { useState, useEffect } from "react";
 
 const Gameboard = (props) => {
-  const {wordList, currentWordIndex, setCurrentWordIndex, currentLetterIndex, setCurrentLetterIndex, startNewGame} = props;
- 
+  const { wordList, currentWordIndex, setCurrentWordIndex, currentLetterIndex, setCurrentLetterIndex, startNewGame } = props;
+  const [letterStates, setLetterStates] = useState([]);
+
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
-  }, []);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [currentWordIndex, currentLetterIndex, letterStates]);
 
   function handleKeyDown(e) {
-    console.log(e.key);
     if (!wordList.length || currentWordIndex >= wordList.length) return;
 
-    const currentWord = wordList[currentWordIndex];
-    const expectedLetter = currentWord[currentLetterIndex] || " ";
+    const currentWord = wordList[currentWordIndex].split("");
+    const currentLetter = currentWord[currentLetterIndex];
+    const expectedLetter = currentLetter || " ";
     const isLetter = e.key.length === 1 && e.key !== " ";
     const isSpace = e.key === " ";
     const isBackspace = e.key === "Backspace";
+    const isFirstLetter = currentLetterIndex === 0;
 
-    if(isBackspace) console.log("hoyeaaa");
+    let newLetterStates = [...letterStates];
+    if (!newLetterStates[currentWordIndex]) {
+      newLetterStates[currentWordIndex] = [];
+    }
+
+    if (isLetter) {
+      if (currentLetter) {
+        newLetterStates[currentWordIndex][currentLetterIndex] = e.key === expectedLetter ? "correct" : "incorrect";
+        setCurrentLetterIndex((prev) => prev + 1);
+      } else {
+        newLetterStates[currentWordIndex].push("incorrect");
+      }
+    }
+
+    if (isSpace) {
+      if (expectedLetter !== " ") {
+        newLetterStates[currentWordIndex] = currentWord.map((_, index) => (newLetterStates[currentWordIndex][index] === "correct" ? "correct" : "incorrect"));
+      }
+      setCurrentWordIndex((prev) => prev + 1);
+      setCurrentLetterIndex(0);
+    }
+
+    if (isBackspace) {
+      if (currentLetterIndex > 0) {
+        setCurrentLetterIndex((prev) => prev - 1);
+        newLetterStates[currentWordIndex][currentLetterIndex - 1] = "";
+      } else if (currentWordIndex > 0) {
+        setCurrentWordIndex((prev) => prev - 1);
+        setCurrentLetterIndex(wordList[currentWordIndex - 1].length);
+      }
+    }
+
+    setLetterStates(newLetterStates);
   }
 
   return (
-    <div className="p-4 text-zinc-500 rounded-lg mx-24">
-      <div className="relative max-h-[8rem] overflow-hidden text-3xl">
+    <div id="game" className="p-4 text-zinc-500 rounded-lg mx-16 mb-10">
+      <div className="relative max-h-[11rem] overflow-hidden text-4xl">
         {wordList.map((word, wordIndex) => (
-          <div className="word inline-block mx-1 my-1" key={wordIndex}>
+          <div className={`word inline-block mr-3 my-2 ${wordIndex === currentWordIndex ? "current" : ""}`} key={wordIndex}>
             {word.split("").map((letter, letterIndex) => (
-              <span key={letterIndex} className="letter">{letter}</span>
+              <span
+                key={letterIndex}
+                className={`letter ${
+                  letterStates[wordIndex]?.[letterIndex] === "correct"
+                    ? "text-white"
+                    : letterStates[wordIndex]?.[letterIndex] === "incorrect"
+                    ? "text-red-500"
+                    : "text-zinc-500"
+                } ${wordIndex === currentWordIndex && letterIndex === currentLetterIndex ? "current" : ""}`}
+              >
+                {letter}
+              </span>
             ))}
           </div>
         ))}

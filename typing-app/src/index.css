@@ -7,3 +7,27 @@
 button{
     cursor: pointer;
 }
+
+#cursor{
+    display:block;
+    background: #3B82F6;
+    width: 1.5px;
+    height: 35px;
+    position: fixed;
+    top: 250px;
+    left: 135px;
+    animation: blink 0.9s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+#correct {
+    color: white;
+}
+  
+#incorrect {
+    color: red;
+}
