@@ -12,9 +12,9 @@ button{
     display:block;
     background: #3B82F6;
     width: 1.5px;
-    height: 35px;
+    height: 37px;
     position: fixed;
-    top: 250px;
+    top: 245px;
     left: 135px;
     animation: blink 0.9s infinite;
 }
@@ -22,12 +22,4 @@ button{
 @keyframes blink {
     0%, 100% { opacity: 1; }
     50% { opacity: 0; }
-}
-
-#correct {
-    color: white;
-}
-  
-#incorrect {
-    color: red;
 }
