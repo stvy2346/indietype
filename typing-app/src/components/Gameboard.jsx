@@ -1,9 +1,9 @@
-import { useEffect } from "react";
+import {useEffect } from "react";
 
-const Gameboard = ({ wordList, currentWordIndex, setCurrentWordIndex, currentLetterIndex, setCurrentLetterIndex, startNewGame }) => {
-
+const Gameboard = (props) => {
+  const {wordList, currentWordIndex, setCurrentWordIndex, currentLetterIndex, setCurrentLetterIndex, startNewGame} = props;
+ 
   useEffect(() => {
-    startNewGame();
     window.addEventListener("keydown", handleKeyDown);
   }, []);
 
@@ -12,7 +12,6 @@ const Gameboard = ({ wordList, currentWordIndex, setCurrentWordIndex, currentLet
     if (!wordList.length || currentWordIndex >= wordList.length) return;
 
     const currentWord = wordList[currentWordIndex];
-    console.log(currentWord);
     const expectedLetter = currentWord[currentLetterIndex] || " ";
     const isLetter = e.key.length === 1 && e.key !== " ";
     const isSpace = e.key === " ";
