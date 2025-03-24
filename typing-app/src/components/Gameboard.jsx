@@ -63,8 +63,7 @@ const Gameboard = (props) => {
 
   function updateCursorPosition(){
     const wordElements = document.querySelectorAll(".word");
-    if (wordElements[currentWordIndex]) {
-      const letterElements = wordElements[currentWordIndex].querySelectorAll(".letter");
+    const letterElements = wordElements[currentWordIndex].querySelectorAll(".letter");
       if (letterElements[currentLetterIndex]) {
         const rect = letterElements[currentLetterIndex].getBoundingClientRect();
         setCursorPosition({ left: rect.left });
@@ -73,7 +72,6 @@ const Gameboard = (props) => {
         const rect = wordElements[currentWordIndex].getBoundingClientRect();
         setCursorPosition({left: rect.right})
       }
-    }
   }
 
   return (
