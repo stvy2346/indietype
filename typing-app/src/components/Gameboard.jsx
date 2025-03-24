@@ -1,13 +1,19 @@
 import { useState, useEffect } from "react";
+import Cursor from './Cursor'
 
 const Gameboard = (props) => {
   const { wordList, currentWordIndex, setCurrentWordIndex, currentLetterIndex, setCurrentLetterIndex, startNewGame } = props;
   const [letterStates, setLetterStates] = useState([]);
+  const [cursorPosition, setCursorPosition] = useState({ left: 135 });
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [currentWordIndex, currentLetterIndex, letterStates]);
+
+  useEffect(()=>{
+    updateCursorPosition();
+  },[currentLetterIndex,currentWordIndex]);
 
   function handleKeyDown(e) {
     if (!wordList.length || currentWordIndex >= wordList.length) return;
@@ -55,9 +61,25 @@ const Gameboard = (props) => {
     setLetterStates(newLetterStates);
   }
 
+  function updateCursorPosition(){
+    const wordElements = document.querySelectorAll(".word");
+    if (wordElements[currentWordIndex]) {
+      const letterElements = wordElements[currentWordIndex].querySelectorAll(".letter");
+      if (letterElements[currentLetterIndex]) {
+        const rect = letterElements[currentLetterIndex].getBoundingClientRect();
+        setCursorPosition({ left: rect.left });
+      }
+      else{
+        const rect = wordElements[currentWordIndex].getBoundingClientRect();
+        setCursorPosition({left: rect.right})
+      }
+    }
+  }
+
   return (
     <div id="game" className="p-4 text-zinc-500 rounded-lg mx-16 mb-10">
       <div className="relative max-h-[11rem] overflow-hidden text-4xl">
+        <Cursor left={cursorPosition.left} isActive={true}/>
         {wordList.map((word, wordIndex) => (
           <div className={`word inline-block mr-3 my-2 ${wordIndex === currentWordIndex ? "current" : ""}`} key={wordIndex}>
             {word.split("").map((letter, letterIndex) => (
