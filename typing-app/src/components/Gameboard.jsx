@@ -4,7 +4,7 @@ import Cursor from './Cursor'
 const Gameboard = (props) => {
   const { wordList, currentWordIndex, setCurrentWordIndex, currentLetterIndex, setCurrentLetterIndex, startNewGame } = props;
   const [letterStates, setLetterStates] = useState([]);
-  const [cursorPosition, setCursorPosition] = useState({ left: 135 });
+  const [cursorPosition, setCursorPosition] = useState({ left: 135, top: 246 });
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
@@ -62,22 +62,23 @@ const Gameboard = (props) => {
   }
 
   function updateCursorPosition(){
-    const wordElements = document.querySelectorAll(".word");
-    const letterElements = wordElements[currentWordIndex].querySelectorAll(".letter");
-      if (letterElements[currentLetterIndex]) {
-        const rect = letterElements[currentLetterIndex].getBoundingClientRect();
-        setCursorPosition({ left: rect.left });
-      }
-      else{
-        const rect = wordElements[currentWordIndex].getBoundingClientRect();
-        setCursorPosition({left: rect.right})
-      }
+    const wordElement = document.querySelector(".word.current");
+    const letterElement = document.querySelector(".letter.current");
+
+    if(letterElement){
+      const rect = letterElement.getBoundingClientRect();
+      console.log(rect);
+      setCursorPosition({top: rect.top,left: rect.left});
+    }else{
+      const rect = wordElement.getBoundingClientRect();
+      setCursorPosition({top: rect.top,left: rect.right});
+    }
   }
 
   return (
     <div id="game" className="p-4 text-zinc-500 rounded-lg mx-16 mb-10">
-      <div className="relative max-h-[11rem] overflow-hidden text-4xl">
-        <Cursor left={cursorPosition.left} isActive={true}/>
+      <div className="gamebox relative max-h-[11rem] overflow-hidden text-4xl">
+        <Cursor left={cursorPosition.left} top={cursorPosition.top} isActive={true}/>
         {wordList.map((word, wordIndex) => (
           <div className={`word inline-block mr-3 my-2 ${wordIndex === currentWordIndex ? "current" : ""}`} key={wordIndex}>
             {word.split("").map((letter, letterIndex) => (
