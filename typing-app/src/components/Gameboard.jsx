@@ -59,6 +59,8 @@ const Gameboard = (props) => {
     }
 
     setLetterStates(newLetterStates);
+
+    moveGameBox();
   }
 
   function updateCursorPosition(){
@@ -69,15 +71,29 @@ const Gameboard = (props) => {
       const rect = letterElement.getBoundingClientRect();
       console.log(rect);
       setCursorPosition({top: rect.top,left: rect.left});
-    }else{
+    }else if(wordElement){
       const rect = wordElement.getBoundingClientRect();
       setCursorPosition({top: rect.top,left: rect.right});
-    }
+    }else return;
   }
 
+  function moveGameBox() {
+    const wordElement = document.querySelector(".word.current");
+    if (!wordElement) return;
+  
+    const wordBox = document.getElementById('words');
+    if (!wordBox) return;
+  
+    if (wordElement.getBoundingClientRect().top > 300) {
+      const margin = parseInt(wordBox.style.marginTop || '0', 10);
+      wordBox.style.marginTop = (margin - 34) + 'px';
+    }
+  }
+  
+
   return (
-    <div id="game" className="p-4 text-zinc-500 rounded-lg mx-16 mb-10">
-      <div className="gamebox relative max-h-[11rem] overflow-hidden text-4xl">
+    <div id="game" className="p-4 text-zinc-500 rounded-lg mx-16 mb-10 py-2 overflow-hidden min-h-[10.50rem]">
+      <div id="words" className="relative min-h-[10.25rem] max-h-[10.25rem] text-4xl">
         <Cursor left={cursorPosition.left} top={cursorPosition.top} isActive={true}/>
         {wordList.map((word, wordIndex) => (
           <div className={`word inline-block mr-3 my-2 ${wordIndex === currentWordIndex ? "current" : ""}`} key={wordIndex}>
