@@ -4,7 +4,7 @@ import Cursor from './Cursor'
 const Gameboard = (props) => {
   const { wordList, currentWordIndex, setCurrentWordIndex, currentLetterIndex, setCurrentLetterIndex, startNewGame } = props;
   const [letterStates, setLetterStates] = useState([]);
-  const [cursorPosition, setCursorPosition] = useState({ left: 135, top: 246 });
+  const [cursorPosition, setCursorPosition] = useState({ left: 135, top: 270 });
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
@@ -84,9 +84,9 @@ const Gameboard = (props) => {
     const wordBox = document.getElementById('words');
     if (!wordBox) return;
   
-    if (wordElement.getBoundingClientRect().top > 300) {
+    if (wordElement.getBoundingClientRect().top > 350) {
       const margin = parseInt(wordBox.style.marginTop || '0', 10);
-      wordBox.style.marginTop = (margin - 34) + 'px';
+      wordBox.style.marginTop = (margin - 57) + 'px';
     }
   }
   
