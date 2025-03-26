@@ -6,7 +6,7 @@ const Settingbar = (props) =>{
     const themeOptions = ["Light","Dark"]
 
     return(
-        <div className="bg-red-500 text-zinc-900 p-4 rounded-md flex items-center mx-130 gap-15 mb-10">
+        <div className="bg-red-500 text-zinc-900 p-4 rounded-md flex items-center max-w-[20rem] gap-15 mb-10">
             <div className="flex gap-5">
                 {timeOptions.map((time)=>(
                     <button 

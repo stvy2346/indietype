@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Cursor from './Cursor'
 
 const Gameboard = (props) => {
-  const { wordList, currentWordIndex, setCurrentWordIndex, currentLetterIndex, setCurrentLetterIndex, startNewGame } = props;
+  const { wordList, currentWordIndex, setCurrentWordIndex, currentLetterIndex, setCurrentLetterIndex,time,setTime,theme,setTheme,startTimer } = props;
   const [letterStates, setLetterStates] = useState([]);
   const [cursorPosition, setCursorPosition] = useState({ left: 135, top: 270 });
 
@@ -18,13 +18,16 @@ const Gameboard = (props) => {
   function handleKeyDown(e) {
     if (!wordList.length || currentWordIndex >= wordList.length) return;
 
+    const isFirst = document.querySelector('.firstLetter');
+    if(isFirst){
+      startTimer();
+    }
     const currentWord = wordList[currentWordIndex].split("");
     const currentLetter = currentWord[currentLetterIndex];
     const expectedLetter = currentLetter || " ";
     const isLetter = e.key.length === 1 && e.key !== " ";
     const isSpace = e.key === " ";
     const isBackspace = e.key === "Backspace";
-    const isFirstLetter = currentLetterIndex === 0;
 
     let newLetterStates = [...letterStates];
     if (!newLetterStates[currentWordIndex]) {
@@ -69,7 +72,7 @@ const Gameboard = (props) => {
 
     if(letterElement){
       const rect = letterElement.getBoundingClientRect();
-      console.log(rect);
+      //console.log(rect);
       setCursorPosition({top: rect.top,left: rect.left});
     }else if(wordElement){
       const rect = wordElement.getBoundingClientRect();
@@ -106,7 +109,8 @@ const Gameboard = (props) => {
                     : letterStates[wordIndex]?.[letterIndex] === "incorrect"
                     ? "text-red-500"
                     : "text-zinc-500"
-                } ${wordIndex === currentWordIndex && letterIndex === currentLetterIndex ? "current" : ""}`}
+                } ${wordIndex === currentWordIndex && letterIndex === currentLetterIndex ? "current" : ""}
+                  ${wordIndex === 0 && letterIndex === 0 ? "firstLetter" : ""}`}
               >
                 {letter}
               </span>

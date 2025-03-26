@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState,useEffect } from 'react'
 import Header from './components/Header'
 import Timerorspeed from './components/Timerorspeed'
 import Restart from './components/Restart'
@@ -15,17 +15,49 @@ function App() {
     const [wordList, setWordList] = useState(newWords);
     const [currentWordIndex, setCurrentWordIndex] = useState(0);
     const [currentLetterIndex, setCurrentLetterIndex] = useState(0);
+    const [time,setTime] = useState(30);
+    const [theme,setTheme] = useState("Dark");
+    const [timerRunning,setTimerRunning] = useState(false);
 
     const startNewGame = () => {  
       window.location.reload();
     };
 
+    function startTimer(){
+      setTimerRunning(true);
+    }
+
+    useEffect(()=>{
+      if(time > 0 && timerRunning){
+          const timer = setInterval(()=>{
+              setTime((prev) => Math.max(prev - 1,0));
+
+          },1000);
+          return () => clearInterval(timer);
+      }
+  },[time,timerRunning]);
+
   return (
     <main className="bg-zinc-900 min-h-screen px-15 py-5">
       <Header/>
-      <Settingbar/>
-      <Timerorspeed/>
-      <Gameboard wordList={wordList} setWordList={setWordList} currentWordIndex={currentWordIndex} currentLetterIndex={currentLetterIndex} setCurrentWordIndex={setCurrentWordIndex} setCurrentLetterIndex={setCurrentLetterIndex} startNewGame={startNewGame}/>
+      <div className='flex flex-col justify-center items-center'>
+        <Settingbar/>
+      </div>
+      <Timerorspeed time={time} setTime={setTime} startTimer={startTimer}/>
+      <Gameboard 
+        wordList={wordList} 
+        setWordList={setWordList} 
+        currentWordIndex={currentWordIndex} 
+        currentLetterIndex={currentLetterIndex} 
+        setCurrentWordIndex={setCurrentWordIndex} 
+        setCurrentLetterIndex={setCurrentLetterIndex} 
+        startNewGame={startNewGame}
+        time={time}
+        setTime={setTime}
+        theme={theme}
+        setTheme={setTheme}
+        startTimer={startTimer}
+      />
       <div className='flex flex-col justify-center items-center'>
         <Restart onRestart={startNewGame}/>
       </div>
