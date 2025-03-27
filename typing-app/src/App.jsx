@@ -35,7 +35,7 @@ function App() {
       const correctWords = letterStates.filter((wordState)=>{
           return wordState && wordState.every((letterState) => letterState === "correct");
       }).length;
-      return Math.round(correctWords * ((60)/initialTime));
+      return correctWords > 1 ? Math.round((correctWords) * ((60)/initialTime)) : 0;
     }
 
     useEffect(()=>{
@@ -52,7 +52,14 @@ function App() {
     <main className="bg-zinc-900 min-h-screen px-15 py-5">
       <Header/>
       <div className='flex justify-center items-center'>
-        <Settingbar/>
+        <Settingbar 
+          initialTime={initialTime}
+          setInitialTime={setInitialTime}
+          time={time}
+          setTime={setTime}
+          theme={theme}
+          setTheme={setTheme}
+        />
       </div>
       <div className='px-20 mb-4 min-h-[40px]'>
           {timerVisible && <Timerorspeed 

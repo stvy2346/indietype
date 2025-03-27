@@ -56,8 +56,18 @@ const Gameboard = (props) => {
         setCurrentLetterIndex((prev) => prev - 1);
         newLetterStates[currentWordIndex][currentLetterIndex - 1] = "";
       } else if (currentWordIndex > 0) {
-        setCurrentWordIndex((prev) => prev - 1);
-        setCurrentLetterIndex(wordList[currentWordIndex - 1].length);
+        const currentWordElement = document.querySelectorAll('.word')[currentWordIndex];
+        const previousWordElement = document.querySelectorAll('.word')[currentWordIndex-1];
+
+        if(previousWordElement){
+          const currentTop = currentWordElement.getBoundingClientRect().top;
+          const previousTop = previousWordElement.getBoundingClientRect().top;
+
+          if(currentTop === previousTop){
+            setCurrentWordIndex((prev) => prev - 1);
+            setCurrentLetterIndex(wordList[currentWordIndex - 1].length);
+          }
+        }
       }
     }
 

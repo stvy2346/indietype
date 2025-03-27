@@ -1,19 +1,25 @@
 import React from "react";
 
 const Settingbar = (props) =>{
-    const {} = props;
+    const {initialTime,setInitialTime,theme,setTheme,time,setTime} = props;
     const timeOptions = [15, 30, 45, 60];
     const themeOptions = ["Light","Dark"]
 
     return(
-        <div className="bg-red-500 text-zinc-900 p-4 rounded-md flex items-center max-w-[20rem] gap-15 mb-10">
+        <div className="bg-zinc-700 text-zinc-500 p-4 rounded-md flex items-center max-w-[20rem] gap-15 mb-10">
             <div className="flex gap-5">
-                {timeOptions.map((time)=>(
+                {timeOptions.map((timeOption)=>(
                     <button 
-                        key={time}
-
+                        key={timeOption}
+                        className={`${initialTime === timeOption ? "text-blue-500" : ""}`}
+                        onClick={()=>{
+                            if(initialTime !== timeOption){
+                                setInitialTime(timeOption);
+                                setTime(timeOption);
+                            }
+                        }}
                     >
-                        {time}
+                        {timeOption}
                     </button>
                 ))}
             </div>
