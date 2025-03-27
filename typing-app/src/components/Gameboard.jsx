@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import Cursor from './Cursor'
 
 const Gameboard = (props) => {
-  const { wordList, currentWordIndex, setCurrentWordIndex, currentLetterIndex, setCurrentLetterIndex,time,setTime,theme,setTheme,startTimer } = props;
-  const [letterStates, setLetterStates] = useState([]);
+  const { wordList, currentWordIndex, setCurrentWordIndex, currentLetterIndex, setCurrentLetterIndex,theme,setTheme,startTimer,letterStates,setLetterStates} = props;
+  
   const [cursorPosition, setCursorPosition] = useState({ left: 135, top: 270 });
 
   useEffect(() => {

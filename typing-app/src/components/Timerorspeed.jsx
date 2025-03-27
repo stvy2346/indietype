@@ -1,13 +1,20 @@
 import React from "react";
+import { useEffect } from "react";
 
 const Timerorspeed = (props) =>{
-    const {time,setTime,startTimer} = props;
+    const {time,getWPM,timerRunning,setTimerRunning} = props;
+
+    useEffect(() => {
+        if (time <= 0 && timerRunning) {
+          setTimerRunning(false);
+        }
+      }, [time, timerRunning, setTimerRunning]);
     
-    return(
-        <div className="text-4xl text-white px-20 mb-4">
-            {time}
-        </div>
-    )
+    if(timerRunning){
+        return <div className="text-4xl text-white ">{time}</div>
+    }else{
+        return <div className="text-4xl text-white">WPM : {getWPM()}</div>
+    }
 }
 
 export default Timerorspeed;

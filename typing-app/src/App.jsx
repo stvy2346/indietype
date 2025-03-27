@@ -15,16 +15,27 @@ function App() {
     const [wordList, setWordList] = useState(newWords);
     const [currentWordIndex, setCurrentWordIndex] = useState(0);
     const [currentLetterIndex, setCurrentLetterIndex] = useState(0);
-    const [time,setTime] = useState(30);
+    const [initialTime,setInitialTime] = useState(30);
+    const [time,setTime] = useState(initialTime);
     const [theme,setTheme] = useState("Dark");
     const [timerRunning,setTimerRunning] = useState(false);
+    const [letterStates, setLetterStates] = useState([]);
+    const [timerVisible,setTimerVisible] = useState(false);
 
     const startNewGame = () => {  
       window.location.reload();
     };
 
     function startTimer(){
+      setTimerVisible(true);
       setTimerRunning(true);
+    }
+
+    function getWPM(){
+      const correctWords = letterStates.filter((wordState)=>{
+          return wordState && wordState.every((letterState) => letterState === "correct");
+      }).length;
+      return Math.round(correctWords * ((60)/initialTime));
     }
 
     useEffect(()=>{
@@ -35,25 +46,32 @@ function App() {
           },1000);
           return () => clearInterval(timer);
       }
-  },[time,timerRunning]);
+    },[time,timerRunning]);
 
   return (
     <main className="bg-zinc-900 min-h-screen px-15 py-5">
       <Header/>
-      <div className='flex flex-col justify-center items-center'>
+      <div className='flex justify-center items-center'>
         <Settingbar/>
       </div>
-      <Timerorspeed time={time} setTime={setTime} startTimer={startTimer}/>
+      <div className='px-20 mb-4 min-h-[40px]'>
+          {timerVisible && <Timerorspeed 
+            time={time}
+            getWPM={getWPM}
+            timerRunning={timerRunning}
+            setTimerRunning={setTimerRunning}
+          />}
+      </div>
       <Gameboard 
         wordList={wordList} 
         setWordList={setWordList} 
+        letterStates={letterStates}
+        setLetterStates={setLetterStates}
         currentWordIndex={currentWordIndex} 
         currentLetterIndex={currentLetterIndex} 
         setCurrentWordIndex={setCurrentWordIndex} 
         setCurrentLetterIndex={setCurrentLetterIndex} 
         startNewGame={startNewGame}
-        time={time}
-        setTime={setTime}
         theme={theme}
         setTheme={setTheme}
         startTimer={startTimer}
