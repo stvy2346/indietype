@@ -23,7 +23,13 @@ function App() {
     const [timerVisible,setTimerVisible] = useState(false);
 
     const startNewGame = () => {  
-      window.location.reload();
+      const newWords1 = Array.from({ length: 200 }, getRandomWord);
+      setWordList(newWords1);
+      setCurrentWordIndex(0);
+      setCurrentLetterIndex(0);
+      setLetterStates([]);
+      setTimerRunning(false);
+      setTimerVisible(false);
     };
 
     function startTimer(){
@@ -59,6 +65,7 @@ function App() {
           setTime={setTime}
           theme={theme}
           setTheme={setTheme}
+          startNewGame={startNewGame}
         />}
       </div>
       <div className='px-20 mb-4 min-h-[40px]'>

@@ -1,7 +1,7 @@
 import React from "react";
 
 const Settingbar = (props) =>{
-    const {initialTime,setInitialTime,theme,setTheme,time,setTime} = props;
+    const {initialTime,setInitialTime,theme,setTheme,time,setTime,startNewGame} = props;
     const timeOptions = [15, 30, 45, 60];
     const themeOptions = ["Light","Dark"]
 
@@ -16,6 +16,7 @@ const Settingbar = (props) =>{
                             if(initialTime !== timeOption){
                                 setInitialTime(timeOption);
                                 setTime(timeOption);
+                                startNewGame();
                             }
                         }}
                     >
