@@ -15,7 +15,6 @@ const Settingbar = (props) =>{
                         onClick={()=>{
                             if(initialTime !== timeOption){
                                 setInitialTime(timeOption);
-                                setTime(timeOption);
                                 startNewGame();
                             }
                         }}
