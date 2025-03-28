@@ -51,15 +51,15 @@ function App() {
   return (
     <main className="bg-zinc-900 min-h-screen px-15 py-5">
       <Header/>
-      <div className='flex justify-center items-center'>
-        <Settingbar 
+      <div className='flex justify-center items-center min-h-[6rem]'>
+        {!timerRunning && <Settingbar 
           initialTime={initialTime}
           setInitialTime={setInitialTime}
           time={time}
           setTime={setTime}
           theme={theme}
           setTheme={setTheme}
-        />
+        />}
       </div>
       <div className='px-20 mb-4 min-h-[40px]'>
           {timerVisible && <Timerorspeed 
