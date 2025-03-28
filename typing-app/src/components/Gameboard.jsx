@@ -97,7 +97,7 @@ const Gameboard = (props) => {
     const wordBox = document.getElementById('words');
     if (!wordBox) return;
   
-    if (wordElement.getBoundingClientRect().top > 350) {
+    if (wordElement.getBoundingClientRect().top > 365) {
       const margin = parseInt(wordBox.style.marginTop || '0', 10);
       wordBox.style.marginTop = (margin - 57) + 'px';
     }
