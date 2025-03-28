@@ -48,7 +48,7 @@ const Gameboard = (props) => {
       }
     }
 
-    if (isSpace) {
+    if (isSpace && currentLetterIndex>0) {
       if (expectedLetter !== " ") {
         newLetterStates[currentWordIndex] = currentWord.map((_, index) => (newLetterStates[currentWordIndex][index] === "correct" ? "correct" : "incorrect"));
       }
