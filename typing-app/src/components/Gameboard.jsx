@@ -112,7 +112,7 @@ const Gameboard = (props) => {
   return (
     <div id="game" className="p-4 text-zinc-500 rounded-lg mx-16 mb-10 py-2 overflow-hidden min-h-[10.50rem]">
       <div id="words" className="relative min-h-[10.25rem] max-h-[10.25rem] text-4xl">
-        <Cursor left={cursorPosition.left} top={cursorPosition.top} isActive={time>0}/>
+        <Cursor left={cursorPosition.left} top={cursorPosition.top} isActive={time>0} theme={theme}/>
         {wordList.map((word, wordIndex) => (
           <div className={`word inline-block mr-3 my-2 ${wordIndex === currentWordIndex ? "current" : ""}`} key={wordIndex}>
             {word.split("").map((letter, letterIndex) => (
@@ -120,10 +120,10 @@ const Gameboard = (props) => {
                 key={letterIndex}
                 className={`letter ${
                   letterStates[wordIndex]?.[letterIndex] === "correct"
-                    ? "text-white"
+                    ? theme === "Dark" ? "text-white" : "text-stone-700"
                     : letterStates[wordIndex]?.[letterIndex] === "incorrect"
-                    ? "text-red-500"
-                    : "text-zinc-500"
+                    ? theme === "Dark" ? "text-red-500" : "text-red-600"
+                    : theme === "Dark" ? "text-zinc-500" : "text-stone-400"
                 } ${wordIndex === currentWordIndex && letterIndex === currentLetterIndex ? "current" : ""}
                   ${wordIndex === 0 && letterIndex === 0 ? "firstLetter" : ""}`}
               >

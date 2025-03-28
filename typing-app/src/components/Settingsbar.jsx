@@ -6,12 +6,16 @@ const Settingbar = (props) =>{
     const themeOptions = ["Light","Dark"]
 
     return(
-        <div className="bg-zinc-700 text-zinc-500 px-4 py-2 rounded-md flex items-center max-w-[25rem] gap-5 mb-10">
+        <div className={`${theme==="Dark" ? "bg-zinc-700 text-zinc-500" : "bg-stone-200 text-stone-400"} px-4 py-2 rounded-md flex items-center max-w-[25rem] gap-5 mb-10`}>
             <div className="flex gap-5">
                 {timeOptions.map((timeOption)=>(
                     <button 
                         key={timeOption}
-                        className={`${initialTime === timeOption ? "text-blue-500" : ""} hover:text-white`}
+                        className={`${initialTime === timeOption 
+                            ? theme === "Dark" ? "text-blue-500" : "text-stone-700" 
+                            : ""} 
+                            ${theme === "Dark" ? "hover:text-white" : "hover:text-stone-600"}`
+                        }
                         onClick={()=>{
                             if(initialTime !== timeOption){
                                 setInitialTime(timeOption);
@@ -23,12 +27,17 @@ const Settingbar = (props) =>{
                     </button>
                 ))}
             </div>
-            <div className="text-2xl text-zinc-400">|</div>
+            <div className={`${theme === "Dark" ? "text-zinc-500" : "text-stone-400"} text-2xl`}>|</div>
             <div className="flex gap-5">
                 {themeOptions.map((themeOption)=>(
                     <button 
                         key={themeOption}
-                        className={`${theme === themeOption ? "text-blue-500" : ""}`}
+                        className={`${theme === themeOption 
+                            ? theme === "Dark" ? "text-blue-500" : "text-stone-700"
+                            : ""
+                        } 
+                        ${theme === "Dark" ? "hover:text-white" : "hover:text-stone-600"}`}
+                        onClick={()=>setTheme(themeOption)}
                     >
                         {themeOption}
                     </button>

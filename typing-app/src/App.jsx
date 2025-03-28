@@ -65,8 +65,10 @@ function App() {
     }, [initialTime]);    
 
   return (
-    <main className="bg-zinc-900 min-h-screen px-15 py-5">
-      <Header/>
+    <main className={`${theme === "Dark" ? "bg-zinc-900": "bg-gray-50"} min-h-screen px-15 py-5`}>
+      <Header 
+        theme={theme}
+      />
       <div className='flex justify-center items-center min-h-[6rem]'>
         {!timerRunning && <Settingbar 
           initialTime={initialTime}
@@ -84,6 +86,7 @@ function App() {
             getWPM={getWPM}
             timerRunning={timerRunning}
             setTimerRunning={setTimerRunning}
+            theme={theme}
           />}
       </div>
       {time > 0 ? 
@@ -106,9 +109,13 @@ function App() {
           getWPM={getWPM}
           initialTime={initialTime} 
           getRawSpeed={getRawSpeed} 
+          theme={theme}
         />}
       <div className='flex flex-col justify-center items-center'>
-        <Restart onRestart={startNewGame}/>
+        <Restart 
+          onRestart={startNewGame}
+          theme={theme}
+        />
       </div>
     </main>
   )

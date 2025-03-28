@@ -1,10 +1,11 @@
 import React from "react";
 
-const Restart = ({onRestart}) =>{
+const Restart = (props) =>{
+    const {onRestart,theme} = props;
     return(
         <button  
             onClick={onRestart} 
-            className="p-0 border-none text-3xl text-zinc-500 hover:text-blue-500 w-10 h-10"
+            className={`${theme === "Dark" ? "text-zinc-500 hover:text-blue-500" : "text-stone-400 hover:text-stone-600"} p-0 border-none text-3xl w-10 h-10`}
         >
             <i className="fa-solid fa-rotate-right"></i>
         </button>
