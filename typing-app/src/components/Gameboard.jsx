@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Cursor from './Cursor'
 
 const Gameboard = (props) => {
-  const { wordList, currentWordIndex, setCurrentWordIndex, currentLetterIndex, setCurrentLetterIndex,theme,setTheme,startTimer,letterStates,setLetterStates} = props;
+  const { wordList, currentWordIndex, setCurrentWordIndex, currentLetterIndex, setCurrentLetterIndex,theme,setTheme,startTimer,letterStates,setLetterStates,time} = props;
   
   const [cursorPosition, setCursorPosition] = useState({ left: 135, top: 270 });
 
@@ -16,10 +16,15 @@ const Gameboard = (props) => {
   },[currentLetterIndex,currentWordIndex]);
 
   function handleKeyDown(e) {
-    if (!wordList.length || currentWordIndex >= wordList.length) return;
+    if (!wordList.length || currentWordIndex >= wordList.length || time <= 0) return;
+
+    const functionalKeys = [
+      "Shift", "Control", "Alt", "Tab", "CapsLock", "Escape", "Meta","ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight","Backspace", "Delete", "NumLock"
+    ];
+    
 
     const isFirst = document.querySelector('.firstLetter');
-    if(isFirst){
+    if(isFirst && !functionalKeys.includes(e.key)){
       startTimer();
     }
     const currentWord = wordList[currentWordIndex].split("");
@@ -97,7 +102,7 @@ const Gameboard = (props) => {
     const wordBox = document.getElementById('words');
     if (!wordBox) return;
   
-    if (wordElement.getBoundingClientRect().top > 365) {
+    if (wordElement.getBoundingClientRect().top > 380) {
       const margin = parseInt(wordBox.style.marginTop || '0', 10);
       wordBox.style.marginTop = (margin - 57) + 'px';
     }
@@ -107,7 +112,7 @@ const Gameboard = (props) => {
   return (
     <div id="game" className="p-4 text-zinc-500 rounded-lg mx-16 mb-10 py-2 overflow-hidden min-h-[10.50rem]">
       <div id="words" className="relative min-h-[10.25rem] max-h-[10.25rem] text-4xl">
-        <Cursor left={cursorPosition.left} top={cursorPosition.top} isActive={true}/>
+        <Cursor left={cursorPosition.left} top={cursorPosition.top} isActive={time>0}/>
         {wordList.map((word, wordIndex) => (
           <div className={`word inline-block mr-3 my-2 ${wordIndex === currentWordIndex ? "current" : ""}`} key={wordIndex}>
             {word.split("").map((letter, letterIndex) => (

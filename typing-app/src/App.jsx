@@ -82,6 +82,7 @@ function App() {
         theme={theme}
         setTheme={setTheme}
         startTimer={startTimer}
+        time = {time}
       />
       <div className='flex flex-col justify-center items-center'>
         <Restart onRestart={startNewGame}/>
