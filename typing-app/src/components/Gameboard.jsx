@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Cursor from './Cursor'
 
 const Gameboard = (props) => {
-  const { wordList, currentWordIndex, setCurrentWordIndex, currentLetterIndex, setCurrentLetterIndex,theme,setTheme,startTimer,letterStates,setLetterStates,time} = props;
+  const { wordList, currentWordIndex, setCurrentWordIndex, currentLetterIndex, setCurrentLetterIndex,theme,setTheme,startTimer,letterStates,setLetterStates,time,correct,setCorrect,incorrect,setIncorrect} = props;
   
   const [cursorPosition, setCursorPosition] = useState({ left: 135, top: 270 });
 
@@ -77,6 +77,9 @@ const Gameboard = (props) => {
     }
 
     setLetterStates(newLetterStates);
+
+    if(e.key === expectedLetter) setCorrect(correct+1);
+    else setIncorrect(incorrect+1);
 
     moveGameBox();
   }

@@ -27,6 +27,8 @@ function App() {
     const [timerRunning,setTimerRunning] = useState(false);
     const [letterStates, setLetterStates] = useState([]);
     const [timerVisible,setTimerVisible] = useState(false);
+    const [correct,setCorrect] = useState(0);
+    const [incorrect,setIncorrect] = useState(0);
 
     const startNewGame = () => {  
       const newWords1 = Array.from({ length: 200 }, getRandomWord);
@@ -61,6 +63,10 @@ function App() {
 
     function getRawSpeed(){
       return currentWordIndex > 1 ? Math.round(currentWordIndex * ((60)/initialTime)) : 0; 
+    }
+
+    function getAccuracy(){
+      return ((correct/(correct+incorrect))*100).toFixed(2);
     }
 
     useEffect(()=>{
@@ -117,12 +123,17 @@ function App() {
           setTheme={setTheme}
           startTimer={startTimer}
           time = {time}
+          correct={correct}
+          setCorrect={setCorrect}
+          incorrect={incorrect}
+          setIncorrect={setIncorrect}
         /> : 
         <Results
           getWPM={getWPM}
           initialTime={initialTime} 
           getRawSpeed={getRawSpeed} 
           theme={theme}
+          getAccuracy={getAccuracy}
         />}
       <div className='flex flex-col justify-center items-center'>
         <Restart 
