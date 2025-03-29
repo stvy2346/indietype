@@ -92,8 +92,6 @@ function App() {
         {!timerRunning && <Settingbar 
           initialTime={initialTime}
           setInitialTime={setInitialTime}
-          time={time}
-          setTime={setTime}
           theme={theme}
           setTheme={setTheme}
           startNewGame={startNewGame}
@@ -102,7 +100,6 @@ function App() {
       <div className='px-20 mb-4 min-h-[40px]'>
           {timerVisible && <Timerorspeed 
             time={time}
-            getWPM={getWPM}
             timerRunning={timerRunning}
             setTimerRunning={setTimerRunning}
             theme={theme}
@@ -120,7 +117,6 @@ function App() {
           setCurrentLetterIndex={setCurrentLetterIndex} 
           startNewGame={startNewGame}
           theme={theme}
-          setTheme={setTheme}
           startTimer={startTimer}
           time = {time}
           correct={correct}
