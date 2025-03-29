@@ -13,12 +13,17 @@ function App() {
   
     const newWords = Array.from({ length: 200 }, getRandomWord);
   
+    const getStoredValue = (key,defaultValue) => {
+      const stored = localStorage.getItem(key);
+      return stored !== null ? JSON.parse(stored) : defaultValue;
+    };
+
     const [wordList, setWordList] = useState(newWords);
     const [currentWordIndex, setCurrentWordIndex] = useState(0);
     const [currentLetterIndex, setCurrentLetterIndex] = useState(0);
-    const [initialTime,setInitialTime] = useState(30);
+    const [initialTime,setInitialTime] = useState(getStoredValue("initialTime",30));
     const [time,setTime] = useState(initialTime);
-    const [theme,setTheme] = useState("Dark");
+    const [theme,setTheme] = useState(getStoredValue("theme",'Dark'));
     const [timerRunning,setTimerRunning] = useState(false);
     const [letterStates, setLetterStates] = useState([]);
     const [timerVisible,setTimerVisible] = useState(false);
@@ -38,6 +43,14 @@ function App() {
       setTimerVisible(true);
       setTimerRunning(true);
     }
+
+    useEffect(() => {
+        localStorage.setItem('theme', JSON.stringify(theme));
+    }, [theme]);
+
+    useEffect(() => {
+        localStorage.setItem('initialTime', JSON.stringify(initialTime));
+    }, [initialTime]);
 
     function getWPM(){
       const correctWords = letterStates.filter((wordState)=>{

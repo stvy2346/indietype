@@ -3,7 +3,20 @@ import React from "react";
 const Settingbar = (props) =>{
     const {initialTime,setInitialTime,theme,setTheme,time,setTime,startNewGame} = props;
     const timeOptions = [15, 30, 45, 60];
-    const themeOptions = ["Light","Dark"]
+    const themeOptions = ["Light","Dark"];
+
+    const handleThemeChange = (themeOption) => {
+        setTheme(themeOption);
+        localStorage.setItem("theme",JSON.stringify(themeOption));
+    }
+
+    const handleTimeChange = (timeOption) =>{
+        if(initialTime !== timeOption){
+            setInitialTime(timeOption);
+            localStorage.setItem("initialTime",JSON.stringify(timeOption));
+            startNewGame();
+        }
+    }
 
     return(
         <div className={`${theme==="Dark" ? "bg-zinc-700 text-zinc-500" : "bg-stone-200 text-stone-400"} px-4 py-2 rounded-md flex items-center max-w-[25rem] gap-5 mb-10`}>
@@ -16,12 +29,7 @@ const Settingbar = (props) =>{
                             : ""} 
                             ${theme === "Dark" ? "hover:text-white" : "hover:text-stone-600"}`
                         }
-                        onClick={()=>{
-                            if(initialTime !== timeOption){
-                                setInitialTime(timeOption);
-                                startNewGame();
-                            }
-                        }}
+                        onClick={()=>handleTimeChange(timeOption)}
                     >
                         {timeOption}
                     </button>
@@ -37,7 +45,7 @@ const Settingbar = (props) =>{
                             : ""
                         } 
                         ${theme === "Dark" ? "hover:text-white" : "hover:text-stone-600"}`}
-                        onClick={()=>setTheme(themeOption)}
+                        onClick={()=>handleThemeChange(themeOption)}
                     >
                         {themeOption}
                     </button>
