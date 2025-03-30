@@ -26,6 +26,7 @@ function App() {
     const [theme,setTheme] = useState(getStoredValue("theme",'Dark'));
     const [timerRunning,setTimerRunning] = useState(false);
     const [letterStates, setLetterStates] = useState([]);
+    // ?? timerVisible not implemented?
     const [timerVisible,setTimerVisible] = useState(false);
     const [correct,setCorrect] = useState(0);
     const [incorrect,setIncorrect] = useState(0);
@@ -78,6 +79,7 @@ function App() {
           return () => clearInterval(timer);
       }
     },[time,timerRunning]);
+    // ?? setinterval is used not recommend with tab is in background.
 
     useEffect(() => {
       setTime(initialTime);
@@ -87,6 +89,7 @@ function App() {
     <main className={`${theme === "Dark" ? "bg-zinc-900": "bg-gray-50"} min-h-screen px-15 py-5`}>
       <Header 
         theme={theme}
+        startNewGame={startNewGame}
       />
       <div className='flex justify-center items-center min-h-[6rem]'>
         {!timerRunning && <Settingbar 

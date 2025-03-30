@@ -6,6 +6,7 @@ const Gameboard = (props) => {
   
   const [cursorPosition, setCursorPosition] = useState({ left: 135, top: 270 });
 
+
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
@@ -14,6 +15,14 @@ const Gameboard = (props) => {
   useEffect(()=>{
     updateCursorPosition();
   },[currentLetterIndex,currentWordIndex]);
+
+
+  const isWordCorrect = (wordIndex) => {
+    if (!letterStates[wordIndex]) return false;
+    
+    const word = wordList[wordIndex].split("");
+    return word.every((letter, index) => letterStates[wordIndex][index] === "correct");
+  };
 
   function handleKeyDown(e) {
     if (!wordList.length || currentWordIndex >= wordList.length || time <= 0) return;
@@ -61,8 +70,13 @@ const Gameboard = (props) => {
         setCurrentLetterIndex((prev) => prev - 1);
         newLetterStates[currentWordIndex][currentLetterIndex - 1] = "";
       } else if (currentWordIndex > 0) {
+        // ?? use a variable to toggle this behaviour if require
+        const prevWordCorrect = isWordCorrect(currentWordIndex-1);
+        if(prevWordCorrect) return;
+
         const currentWordElement = document.querySelectorAll('.word')[currentWordIndex];
         const previousWordElement = document.querySelectorAll('.word')[currentWordIndex-1];
+
 
         if(previousWordElement){
           const currentTop = currentWordElement.getBoundingClientRect().top;
