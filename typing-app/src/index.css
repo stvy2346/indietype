@@ -8,7 +8,7 @@ button{
     cursor: pointer;
 }
 
-#cursor{
+/* .cursor{
     display:block;
     width: 1.5px;
     height: 40px;
@@ -16,9 +16,28 @@ button{
     top: 246px;
     left: 135px;
     animation: blink 0.9s infinite;
-}
+} */
 
 @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-}
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+  
+  .animate-blink {
+    animation: blink 0.9s infinite;
+  }
+  
+
+.letter {
+    position: relative;
+  }
+  
+  .typing-cursor {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+  }

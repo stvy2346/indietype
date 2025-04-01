@@ -1,21 +1,25 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import Cursor from './Cursor'
 
 const Gameboard = (props) => {
-  const { wordList, currentWordIndex, setCurrentWordIndex, currentLetterIndex, setCurrentLetterIndex,theme,startTimer,letterStates,setLetterStates,time,correct,setCorrect,incorrect,setIncorrect} = props;
+  const { wordList, currentWordIndex, setCurrentWordIndex, currentLetterIndex, setCurrentLetterIndex, theme, startTimer, letterStates, setLetterStates, time, correct, setCorrect, incorrect, setIncorrect } = props;
   
-  const [cursorPosition, setCursorPosition] = useState({ left: 135, top: 270 });
+  const wordsContainerRef = useRef(null);
+  const gameRef = useRef(null);
 
-
+  const [fontSize, setFontSize] = useState("text-2xl");
+  const [containerPadding, setContainerPadding] = useState("mx-4");
+  const [gameHeight, setGameHeight] = useState("min-h-[8rem]");
+  const [wordsHeight, setWordsHeight] = useState("min-h-[7.75rem] max-h-[7.75rem]");
+  
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [currentWordIndex, currentLetterIndex, letterStates]);
 
-  useEffect(()=>{
-    updateCursorPosition();
-  },[currentLetterIndex,currentWordIndex]);
-
+  useEffect(() => {
+    adjustWordsPosition();
+  }, [currentLetterIndex, currentWordIndex]);
 
   const isWordCorrect = (wordIndex) => {
     if (!letterStates[wordIndex]) return false;
@@ -24,18 +28,52 @@ const Gameboard = (props) => {
     return word.every((letter, index) => letterStates[wordIndex][index] === "correct");
   };
 
+
+  useLayoutEffect(() => {
+    function handleResize() {
+      if (window.innerWidth >= 1280) {
+        // xl breakpoint
+        setFontSize("text-4xl");
+        setContainerPadding("mx-16");
+        setGameHeight("min-h-[10.50rem]");
+        setWordsHeight("min-h-[10.25rem] max-h-[10.25rem]");
+      } else if (window.innerWidth >= 1024) {
+        // lg breakpoint
+        setFontSize("text-3xl");
+        setContainerPadding("mx-12");
+        setGameHeight("min-h-[9.50rem]");
+        setWordsHeight("min-h-[9.25rem] max-h-[9.25rem]");
+      } else if (window.innerWidth >= 768) {
+        // md breakpoint
+        setFontSize("text-2xl");
+        setContainerPadding("mx-8");
+        setGameHeight("min-h-[8.50rem]");
+        setWordsHeight("min-h-[8.25rem] max-h-[8.25rem]");
+      } else {
+        // sm breakpoint
+        setFontSize("text-xl");
+        setContainerPadding("mx-4");
+        setGameHeight("min-h-[7.50rem]");
+        setWordsHeight("min-h-[7.25rem] max-h-[7.25rem]");
+      }
+    }handleResize(); // Set initial size
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   function handleKeyDown(e) {
     if (!wordList.length || currentWordIndex >= wordList.length || time <= 0) return;
 
     const functionalKeys = [
-      "Shift", "Control", "Alt", "Tab", "CapsLock", "Escape", "Meta","ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight","Backspace", "Delete", "NumLock"
+      "Shift", "Control", "Alt", "Tab", "CapsLock", "Escape", "Meta", "ArrowUp", 
+      "ArrowDown", "ArrowLeft", "ArrowRight", "Backspace", "Delete", "NumLock"
     ];
     
-
     const isFirst = document.querySelector('.firstLetter');
-    if(isFirst && !functionalKeys.includes(e.key)){
+    if (isFirst && !functionalKeys.includes(e.key)) {
       startTimer();
     }
+    
     const currentWord = wordList[currentWordIndex].split("");
     const currentLetter = currentWord[currentLetterIndex];
     const expectedLetter = currentLetter || " ";
@@ -57,7 +95,7 @@ const Gameboard = (props) => {
       }
     }
 
-    if (isSpace && currentLetterIndex>0) {
+    if (isSpace) {
       if (expectedLetter !== " ") {
         newLetterStates[currentWordIndex] = currentWord.map((_, index) => (newLetterStates[currentWordIndex][index] === "correct" ? "correct" : "incorrect"));
       }
@@ -70,19 +108,17 @@ const Gameboard = (props) => {
         setCurrentLetterIndex((prev) => prev - 1);
         newLetterStates[currentWordIndex][currentLetterIndex - 1] = "";
       } else if (currentWordIndex > 0) {
-        // ?? use a variable to toggle this behaviour if require
         const prevWordCorrect = isWordCorrect(currentWordIndex-1);
-        if(prevWordCorrect) return;
+        if (prevWordCorrect) return;
 
         const currentWordElement = document.querySelectorAll('.word')[currentWordIndex];
         const previousWordElement = document.querySelectorAll('.word')[currentWordIndex-1];
 
-
-        if(previousWordElement){
+        if (previousWordElement) {
           const currentTop = currentWordElement.getBoundingClientRect().top;
           const previousTop = previousWordElement.getBoundingClientRect().top;
 
-          if(currentTop === previousTop){
+          if (currentTop === previousTop) {
             setCurrentWordIndex((prev) => prev - 1);
             setCurrentLetterIndex(wordList[currentWordIndex - 1].length);
           }
@@ -92,50 +128,55 @@ const Gameboard = (props) => {
 
     setLetterStates(newLetterStates);
 
-    if(e.key === expectedLetter) setCorrect(correct+1);
+    if (e.key === expectedLetter) setCorrect(correct+1);
     else setIncorrect(incorrect+1);
-
-    moveGameBox();
   }
 
-  function updateCursorPosition(){
-    const wordElement = document.querySelector(".word.current");
-    const letterElement = document.querySelector(".letter.current");
 
-    if(letterElement){
-      const rect = letterElement.getBoundingClientRect();
-      //console.log(rect);
-      setCursorPosition({top: rect.top,left: rect.left});
-    }else if(wordElement){
-      const rect = wordElement.getBoundingClientRect();
-      setCursorPosition({top: rect.top,left: rect.right});
-    }else return;
-  }
 
-  function moveGameBox() {
+  function adjustWordsPosition() {
+    if (!wordsContainerRef.current || !gameRef.current) return;
+    
     const wordElement = document.querySelector(".word.current");
     if (!wordElement) return;
-  
-    const wordBox = document.getElementById('words');
-    if (!wordBox) return;
-  
-    if (wordElement.getBoundingClientRect().top > 380) {
-      const margin = parseInt(wordBox.style.marginTop || '0', 10);
-      wordBox.style.marginTop = (margin - 57) + 'px';
+    
+    const gameBox = gameRef.current;
+    const wordsContainer = wordsContainerRef.current;
+    const gameBoxRect = gameBox.getBoundingClientRect();
+    const wordRect = wordElement.getBoundingClientRect();
+    
+    // Get the computed line height or use a fallback based on font size
+    const computedStyle = getComputedStyle(wordElement);
+    const lineHeight = parseInt(computedStyle.lineHeight) || parseInt(computedStyle.fontSize) * 1.5;
+    
+    // If the current word is too close to the bottom or below the visible area
+    if (gameBoxRect.bottom - wordRect.bottom < lineHeight * 1.5) {
+      const currentMargin = parseInt(getComputedStyle(wordsContainer).marginTop) || 0;
+      const scrollAmount = currentMargin - lineHeight;
+      
+      wordsContainer.style.transition = 'margin-top 0.2s ease-out';
+      wordsContainer.style.marginTop = `${scrollAmount}px`;
     }
   }
-  
 
   return (
-    <div id="game" className="p-4 text-zinc-500 rounded-lg mx-16 mb-10 py-2 overflow-hidden min-h-[10.50rem]">
-      <div id="words" className="relative min-h-[10.25rem] max-h-[10.25rem] text-4xl">
-        <Cursor left={cursorPosition.left} top={cursorPosition.top} isActive={time>0} theme={theme}/>
+    <div 
+      id="game" 
+      ref={gameRef} 
+      className={`p-4 text-zinc-500 rounded-lg ${containerPadding} mb-10 py-2 overflow-hidden ${gameHeight}`}
+    >
+      <div 
+        id="words" 
+        ref={wordsContainerRef} 
+        className={`relative ${wordsHeight} ${fontSize}`}
+        style={{ transition: 'margin-top 0.2s ease-out' }}
+      >
         {wordList.map((word, wordIndex) => (
           <div className={`word inline-block mr-3 my-2 ${wordIndex === currentWordIndex ? "current" : ""}`} key={wordIndex}>
             {word.split("").map((letter, letterIndex) => (
               <span
                 key={letterIndex}
-                className={`letter ${
+                className={`letter relative ${
                   letterStates[wordIndex]?.[letterIndex] === "correct"
                     ? theme === "Dark" ? "text-white" : "text-stone-700"
                     : letterStates[wordIndex]?.[letterIndex] === "incorrect"
@@ -145,8 +186,15 @@ const Gameboard = (props) => {
                   ${wordIndex === 0 && letterIndex === 0 ? "firstLetter" : ""}`}
               >
                 {letter}
+                {wordIndex === currentWordIndex && letterIndex === currentLetterIndex && (
+            <Cursor isActive={time>0} theme={theme} />
+          )}
+
               </span>
             ))}
+            {/* {wordIndex === currentWordIndex && currentLetterIndex === word.length && (
+        <Cursor isActive={time>0} theme={theme} />
+      )} */}
           </div>
         ))}
       </div>
