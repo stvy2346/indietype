@@ -31,13 +31,8 @@ const Gameboard = (props) => {
     const [wordsHeight, setWordsHeight] = useState(
         "min-h-[7.75rem] max-h-[7.75rem]"
     );
-    const [transitionClass,setTransitionClass] = useState("");
 
-    useEffect(() => {
-        setTimeout(() => {
-          setTransitionClass("transition-all duration-500 ease-in-out");
-        }, 100);
-      }, []);
+
 
     useEffect(() => {
         window.addEventListener("keydown", handleKeyDown);
@@ -305,10 +300,8 @@ const Gameboard = (props) => {
             id="game"
             ref={gameRef}
             className={`p-4 text-zinc-500 rounded-lg ${containerPadding} mb-10 py-2 overflow-hidden ${gameHeight}
- ${transitionClass} ${
-                animate
-                    ? "opacity-0 transform -translate-y-8"
-                    : "opacity-100 transform translate-y-0"
+transition-opacity duration-100 ease-out ${
+                animate ? "opacity-0" : "opacity-100"
             }
                 `}
         >
