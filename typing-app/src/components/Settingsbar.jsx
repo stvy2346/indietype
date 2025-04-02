@@ -10,7 +10,7 @@ const Settingbar = (props) => {
         setLanguage,
     } = props;
     const [isPopupOpen, setIsPopupOpen] = useState(false);
-    const timeOptions = [5, 30, 45, 60];
+    const timeOptions = [15, 30, 45, 60];
     const themeOptions = ["Light", "Dark"];
     const languageOptions = [
         { value: "english", label: "English" },
