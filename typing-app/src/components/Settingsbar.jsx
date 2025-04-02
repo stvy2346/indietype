@@ -90,20 +90,22 @@ const Settingbar = (props) => {
                     <select
                         value={language || "english"}
                         onChange={handleLanguageChange}
-                        className={`${
+                        className={`
+                            ${
                             theme === "Dark"
-                                ? "bg-zinc-600 text-white border-zinc-500"
-                                : "bg-stone-100 text-stone-700 border-stone-300"
+                                ? "bg-zinc-700 text-blue-500 border-zinc-500"
+                                : "bg-stone-200 text-stone-700 border-stone-300"
                         } 
-                            border rounded px-2 py-1 focus:outline-none w-full md:w-auto`}
+                            border rounded px-2 py-1 border-none focus:outline-none w-full md:w-auto`}
                     >
                         {languageOptions.map((option) => (
-                            <option key={option.value} value={option.value}>
+                            <option key={option.value} value={option.value} className={`${theme === "Dark" ? "text-white" : "text-stone-700"} `}>
                                 {option.label}
                             </option>
                         ))}
                     </select>
                 </div>
+
                 <div
                     className={`${
                         theme === "Dark" ? "text-zinc-500" : "text-stone-400"
