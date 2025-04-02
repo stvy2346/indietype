@@ -6,7 +6,6 @@ const Settingbar = (props) => {
         setInitialTime,
         theme,
         setTheme,
-        startNewGame,
         language,
         setLanguage,
     } = props;

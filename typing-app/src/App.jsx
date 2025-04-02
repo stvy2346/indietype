@@ -32,16 +32,24 @@ function App() {
 
     const startNewGame = async () => {
         setAnimate(true);
-
+    
         const languageModule = await import(
             `../src/data/languages/${language}.json`
         );
         const wordsArray = languageModule.words;
-
-        const getRandomWord = () =>
-            wordsArray[Math.floor(Math.random() * wordsArray.length)];
-        const newWords = Array.from({ length: 200 }, getRandomWord);
-
+    
+        let newWords = [];
+    
+        while (newWords.length < 200) {
+            const randomWord = wordsArray[Math.floor(Math.random() * wordsArray.length)];
+            
+            if (randomWord.includes(' ')) {
+                newWords.push(...randomWord.split(' '));
+            } else {
+                newWords.push(randomWord);
+            }
+        }
+    
         setWordList(newWords);
         setCurrentWordIndex(0);
         setCurrentLetterIndex(0);
@@ -50,6 +58,7 @@ function App() {
         setTimerVisible(false);
         setTime(initialTime);
     };
+    
 
     const handleRestart = () => {
         setAnimate(true);
