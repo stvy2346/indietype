@@ -172,10 +172,11 @@ const Gameboard = (props) => {
                 newLetterStates[currentWordIndex][currentLetterIndex] =
                     e.key === expectedLetter ? "correct" : "incorrect";
                 setCurrentLetterIndex((prev) => prev + 1);
-            } else {
+            } else if (newLetterStates[currentWordIndex].length < currentWord.length) {
                 newLetterStates[currentWordIndex].push("incorrect");
             }
         }
+        
 
         if (isSpace && currentLetterIndex > 0) {
             if (expectedLetter !== " ") {
@@ -231,7 +232,7 @@ const Gameboard = (props) => {
                 }
             }
         }
-        // console.log(newLetterStates);
+        console.log(newLetterStates);
 
         setLetterStates(newLetterStates);
 

@@ -114,41 +114,53 @@ function App() {
         let incorrectChars = 0;
         let skippedChars = 0;
         let spaces = 0;
-
+        let correctWords = 0;
+        let incorrectWords = 0;
+    
         spaces = currentWordIndex > 0 ? currentWordIndex - 1 : 0;
-
+    
         letterStates.forEach((wordState) => {
             if (!wordState) return;
-
+            
+            let wordCorrect = true;
+            
             wordState.forEach((letterState) => {
                 if (letterState === "correct") {
                     correctChars++;
                 } else if (letterState === "incorrect") {
                     incorrectChars++;
+                    wordCorrect = false;
                 } else if (letterState === "skipped") {
                     skippedChars++;
+                    wordCorrect = false;
                 }
             });
+            
+            if (wordCorrect && wordState.length > 0) {
+                correctWords++;
+            } else if (!wordCorrect) {
+                incorrectWords++;
+            }
         });
-
+    
         const wpm =
             correctChars > 5
                 ? Math.round((correctChars / 5) * (60 / initialTime))
                 : 0;
-
+    
         const rawSpeed =
             correctChars + incorrectChars > 5
                 ? Math.round(
                       ((correctChars + incorrectChars) / 5) * (60 / initialTime)
                   )
                 : 0;
-
+    
         const totalAttempted = correctChars + incorrectChars;
         const accuracy =
             totalAttempted > 0
                 ? ((correctChars / totalAttempted) * 100).toFixed(2)
                 : "100.00";
-
+    
         return {
             wpm,
             rawSpeed,
@@ -157,6 +169,8 @@ function App() {
             incorrectChars,
             skippedChars,
             spaces,
+            correctWords,
+            incorrectWords,
         };
     }
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 const Settingbar = (props) => {
     const {
@@ -9,7 +9,8 @@ const Settingbar = (props) => {
         language,
         setLanguage,
     } = props;
-    const timeOptions = [15, 30, 45, 60];
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const timeOptions = [5, 30, 45, 60];
     const themeOptions = ["Light", "Dark"];
     const languageOptions = [
         { value: "english", label: "English" },
@@ -38,6 +39,7 @@ const Settingbar = (props) => {
             localStorage.setItem("initialTime", JSON.stringify(timeOption));
         }
     };
+
     const handleLanguageChange = (e) => {
         const selectedLanguage = e.target.value;
         console.log(selectedLanguage);
@@ -47,93 +49,155 @@ const Settingbar = (props) => {
         }
     };
 
-    return (
-        <div
-            className={`${
-                theme === "Dark"
-                    ? "bg-zinc-700 text-zinc-500"
-                    : "bg-stone-200 text-stone-400"
-            } px-4 py-2 rounded-md flex items-center max-w-[32rem] gap-5 mb-10 flex-wrap`}
-        >
-            <div className="flex gap-5">
-                {timeOptions.map((timeOption) => (
-                    <button
-                        key={timeOption}
+    const togglePopup = () => {
+        setIsPopupOpen(!isPopupOpen);
+    };
+
+    const renderSettingsContent = () => (
+        <>
+            <div className="flex flex-col md:flex-row md:items-center gap-5">
+                <div className="flex gap-5">
+                    {timeOptions.map((timeOption) => (
+                        <button
+                            key={timeOption}
+                            className={`${
+                                initialTime === timeOption
+                                    ? theme === "Dark"
+                                        ? "text-blue-500"
+                                        : "text-stone-700"
+                                    : ""
+                            } 
+                                ${
+                                    theme === "Dark"
+                                        ? "hover:text-white"
+                                        : "hover:text-stone-600"
+                                }`}
+                            onClick={() => handleTimeChange(timeOption)}
+                        >
+                            {timeOption}
+                        </button>
+                    ))}
+                </div>
+                <div
+                    className={`${
+                        theme === "Dark" ? "text-zinc-500" : "text-stone-400"
+                    } text-2xl hidden md:block`}
+                >
+                    |
+                </div>
+
+                <div className="flex items-center">
+                    <select
+                        value={language || "english"}
+                        onChange={handleLanguageChange}
                         className={`${
-                            initialTime === timeOption
-                                ? theme === "Dark"
-                                    ? "text-blue-500"
-                                    : "text-stone-700"
-                                : ""
+                            theme === "Dark"
+                                ? "bg-zinc-600 text-white border-zinc-500"
+                                : "bg-stone-100 text-stone-700 border-stone-300"
                         } 
+                            border rounded px-2 py-1 focus:outline-none w-full md:w-auto`}
+                    >
+                        {languageOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <div
+                    className={`${
+                        theme === "Dark" ? "text-zinc-500" : "text-stone-400"
+                    } text-2xl hidden md:block`}
+                >
+                    |
+                </div>
+
+                <div className="flex gap-5">
+                    {themeOptions.map((themeOption) => (
+                        <button
+                            key={themeOption}
+                            className={`${
+                                theme === themeOption
+                                    ? theme === "Dark"
+                                        ? "text-blue-500"
+                                        : "text-stone-700"
+                                    : ""
+                            } 
                             ${
                                 theme === "Dark"
                                     ? "hover:text-white"
                                     : "hover:text-stone-600"
                             }`}
-                        onClick={() => handleTimeChange(timeOption)}
-                    >
-                        {timeOption}
-                    </button>
-                ))}
+                            onClick={() => handleThemeChange(themeOption)}
+                        >
+                            {themeOption}
+                        </button>
+                    ))}
+                </div>
             </div>
-            <div
-                className={`${
-                    theme === "Dark" ? "text-zinc-500" : "text-stone-400"
-                } text-2xl`}
-            >
-                |
-            </div>
+        </>
+    );
 
-            <div className="flex items-center">
-                <select
-                    value={language || "english"}
-                    onChange={handleLanguageChange}
+    return (
+        <>
+            <div className="md:hidden mb-4">
+                <button
+                    onClick={togglePopup}
                     className={`${
                         theme === "Dark"
-                            ? "bg-zinc-600 text-white border-zinc-500"
-                            : "bg-stone-100 text-stone-700 border-stone-300"
-                    } 
-                        border rounded px-2 py-1 focus:outline-none`}
+                            ? "bg-zinc-700 text-white"
+                            : "bg-stone-200 text-stone-700"
+                    } px-4 py-2 rounded-md flex items-center justify-center w-full`}
                 >
-                    {languageOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                            {option.label}
-                        </option>
-                    ))}
-                </select>
-            </div>
-            <div
-                className={`${
-                    theme === "Dark" ? "text-zinc-500" : "text-stone-400"
-                } text-2xl`}
-            >
-                |
+                    Settings
+                </button>
             </div>
 
-            <div className="flex gap-5">
-                {themeOptions.map((themeOption) => (
-                    <button
-                        key={themeOption}
+            {isPopupOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 md:hidden">
+                    <div
                         className={`${
-                            theme === themeOption
-                                ? theme === "Dark"
-                                    ? "text-blue-500"
-                                    : "text-stone-700"
-                                : ""
-                        } 
-                        ${
                             theme === "Dark"
-                                ? "hover:text-white"
-                                : "hover:text-stone-600"
-                        }`}
-                        onClick={() => handleThemeChange(themeOption)}
+                                ? "bg-zinc-800 text-zinc-500"
+                                : "bg-white text-stone-400"
+                        } p-5 rounded-lg w-11/12 max-w-sm`}
                     >
-                        {themeOption}
-                    </button>
-                ))}
+                        <div className="flex justify-between items-center mb-4">
+                            <h3
+                                className={`${
+                                    theme === "Dark"
+                                        ? "text-white"
+                                        : "text-stone-700"
+                                } font-medium`}
+                            >
+                                Settings
+                            </h3>
+                            <button
+                                onClick={togglePopup}
+                                className={`${
+                                    theme === "Dark"
+                                        ? "text-white"
+                                        : "text-stone-700"
+                                }`}
+                            >
+                                ✕
+                            </button>
+                        </div>
+                        {renderSettingsContent()}
+                    </div>
+                </div>
+            )}
+
+            <div
+                className={`${
+                    theme === "Dark"
+                        ? "bg-zinc-700 text-zinc-500"
+                        : "bg-stone-200 text-stone-400"
+                } px-4 py-2 rounded-md items-center max-w-[32rem] gap-5 mb-10 hidden md:flex`}
+            >
+                {renderSettingsContent()}
             </div>
-        </div>
+        </>
     );
 };
 
