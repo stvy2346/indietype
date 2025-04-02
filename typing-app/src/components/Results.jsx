@@ -1,7 +1,9 @@
 import React from "react";
 
 const Results = (props) =>{
-    const {getWPM,initialTime,getRawSpeed,theme,getAccuracy} = props;
+    // const {getWPM,initialTime,getRawSpeed,theme,getAccuracy} = props;
+    const {initialTime,theme,getTypingStats} = props;
+    const stats = getTypingStats();
     return(
         <div className="p-4 rounded-lg mx-16 mb-10 py-2 min-h-[10.50rem] flex gap-35 items-center">
             <div className="flex flex-col ml-20">
@@ -9,7 +11,7 @@ const Results = (props) =>{
                     wpm
                 </div>
                 <div className={`${theme === "Dark" ? "text-blue-500" : "text-stone-700"} text-8xl`}>
-                    {getWPM()}
+                    {stats.wpm}
                 </div>
             </div>
             <div className="flex flex-col">
@@ -17,7 +19,7 @@ const Results = (props) =>{
                     acc
                 </div>
                 <div className={`${theme === "Dark" ? "text-blue-500" : "text-stone-700"} text-8xl`}>
-                    {`${getAccuracy()}%`}
+                    {`${stats.accuracy}%`}
                 </div>
             </div>
             <div className="flex flex-col">
@@ -25,7 +27,7 @@ const Results = (props) =>{
                     raw
                 </div>
                 <div className={`${theme === "Dark" ? "text-blue-500" : "text-stone-700"} text-8xl`}>
-                    {Math.max(getRawSpeed(),getWPM())}
+                    {stats.rawSpeed}
                 </div>
             </div>
             <div className="flex flex-col">

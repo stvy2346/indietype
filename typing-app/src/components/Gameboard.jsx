@@ -17,6 +17,8 @@ const Gameboard = (props) => {
         setCorrect,
         incorrect,
         setIncorrect,
+        timerRunning,
+        animate,
     } = props;
 
     const lastExecutionTime = useRef(0);
@@ -179,7 +181,10 @@ const Gameboard = (props) => {
                     (_, index) =>
                         newLetterStates[currentWordIndex][index] === "correct"
                             ? "correct"
-                            : "incorrect"
+                            : newLetterStates[currentWordIndex][index] ===
+                              "incorrect"
+                            ? "incorrect"
+                            : "skipped"
                 );
             }
             setCurrentWordIndex((prev) => prev + 1);
@@ -224,6 +229,7 @@ const Gameboard = (props) => {
                 }
             }
         }
+        // console.log(newLetterStates);
 
         setLetterStates(newLetterStates);
 
@@ -234,7 +240,7 @@ const Gameboard = (props) => {
     // function updateCursorPosition(){
     //   const wordElement = document.querySelector(".word.current");
     //   const letterElement = document.querySelector(".letter.current");
-  
+
     //   if(letterElement){
     //     const rect = letterElement.getBoundingClientRect();
     //     //console.log(rect);
@@ -275,11 +281,29 @@ const Gameboard = (props) => {
         }
     }
 
+    const getTextClasses = (status) => {
+        if (status === "correct")
+            return theme === "Dark" ? "text-white" : "text-stone-700";
+        if (status === "incorrect")
+            return theme === "Dark" ? "text-red-500" : "text-red-600";
+        if (status === "skipped")
+            return `${
+                theme === "Dark" ? "text-zinc-500" : "text-stone-400"
+            } underline decoration-red-400 decoration-[2px] underline-offset-4`;
+        return theme === "Dark" ? "text-zinc-500" : "text-stone-400";
+    };
+
     return (
         <div
             id="game"
             ref={gameRef}
-            className={`p-4 text-zinc-500 rounded-lg ${containerPadding} mb-10 py-2 overflow-hidden ${gameHeight}`}
+            className={`p-4 text-zinc-500 rounded-lg ${containerPadding} mb-10 py-2 overflow-hidden ${gameHeight}
+transition-all duration-500 ease-in-out ${
+                animate
+                    ? "opacity-0 transform -translate-y-8"
+                    : "opacity-100 transform translate-y-0"
+            }
+                `}
         >
             <div
                 id="words"
@@ -297,22 +321,9 @@ const Gameboard = (props) => {
                         {word.split("").map((letter, letterIndex) => (
                             <span
                                 key={letterIndex}
-                                className={`letter relative ${
-                                    letterStates[wordIndex]?.[letterIndex] ===
-                                    "correct"
-                                        ? theme === "Dark"
-                                            ? "text-white"
-                                            : "text-stone-700"
-                                        : letterStates[wordIndex]?.[
-                                              letterIndex
-                                          ] === "incorrect"
-                                        ? theme === "Dark"
-                                            ? "text-red-500"
-                                            : "text-red-600"
-                                        : theme === "Dark"
-                                        ? "text-zinc-500"
-                                        : "text-stone-400"
-                                } ${
+                                className={`letter relative ${getTextClasses(
+                                    letterStates[wordIndex]?.[letterIndex] || ""
+                                )} ${
                                     wordIndex === currentWordIndex &&
                                     letterIndex === currentLetterIndex
                                         ? "current"
@@ -324,12 +335,21 @@ const Gameboard = (props) => {
                                 {wordIndex === currentWordIndex &&
                                     letterIndex === currentLetterIndex && (
                                         <Cursor
-                                            isActive={time > 0}
+                                            timerRunning={timerRunning}
                                             theme={theme}
                                         />
                                     )}
                             </span>
                         ))}
+                        {wordIndex === currentWordIndex &&
+                            currentLetterIndex === word.length && (
+                                <span className="letter relative">
+                                    <Cursor
+                                        timerRunning={timerRunning}
+                                        theme={theme}
+                                    />
+                                </span>
+                            )}
                     </div>
                 ))}
             </div>

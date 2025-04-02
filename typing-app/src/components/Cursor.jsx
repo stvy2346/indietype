@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 const Cursor = (props) => {
-  const {isActive, theme} = props;
+  const {timerRunning, theme} = props;
   
   // Use responsive height classes based on the same breakpoints as the container
   const getHeightClass = () => {
@@ -30,10 +30,11 @@ const Cursor = (props) => {
         w-0.5
         ${heightClass}
         ${theme === "Dark" ? "bg-blue-500" : "bg-stone-700"}
-        ${isActive ? "animate-blink" : ""}
-      `}
-    />
+        ${!timerRunning && "animate-blink"}
+        `}
+        />
   );
 };
+// ${isActive ? "animate-blink" : "|"}
 
 export default Cursor;
