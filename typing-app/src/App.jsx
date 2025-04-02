@@ -5,7 +5,6 @@ import Restart from "./components/Restart";
 import Gameboard from "./components/Gameboard";
 import Settingbar from "./components/Settingsbar";
 import Results from "./components/Results";
-import { loadLanguage } from "./utils/languageUtils";
 
 function App() {
     const getStoredValue = (key, defaultValue) => {
@@ -24,115 +23,59 @@ function App() {
     const [language, setLanguage] = useState(
         getStoredValue("language", "english")
     );
-
-    const [languageData, setLanguageData] = useState(null);
     const [timerRunning, setTimerRunning] = useState(false);
     const [letterStates, setLetterStates] = useState([]);
-    // ?? timerVisible not implemented?
     const [timerVisible, setTimerVisible] = useState(false);
     const [correct, setCorrect] = useState(0);
     const [incorrect, setIncorrect] = useState(0);
     const [animate, setAnimate] = useState(false);
-    
 
-    // useEffect(()=>{
-    //     startNewGame();
-    // },)
-
-    useEffect(() => {
-        const loadLanguageData = async () => {
-            const data = await loadLanguage(language);
-            setLanguageData(data);
-
-            const wordsArray = data.words;
-            let newWords;
-            if (language === "brainrot") {
-                const multiWordPhrases = wordsArray.filter((word) =>
-                    word.includes(" ")
-                );
-                const singleWords = wordsArray.filter(
-                    (word) => !word.includes(" ")
-                );
-                const getRandomWord = () =>
-                    Math.random() < 0.2 && multiWordPhrases.length > 0
-                        ? multiWordPhrases[
-                              Math.floor(
-                                  Math.random() * multiWordPhrases.length
-                              )
-                          ]
-                        : singleWords[
-                              Math.floor(Math.random() * singleWords.length)
-                          ];
-                newWords = Array.from({ length: 200 }, getRandomWord);
-            } else {
-                const getRandomWord = () =>
-                    wordsArray[Math.floor(Math.random() * wordsArray.length)];
-                newWords = Array.from({ length: 200 }, getRandomWord);
-            }
-            setWordList(newWords);
-        };
-
-        loadLanguageData();
-    }, [language]);
-
-    const startNewGame = () => {
+    const startNewGame = async () => {
         setAnimate(true);
 
-            const wordsArray = languageData.words;
-            let newWords1;
-            if (language === "brainrot") {
-                const multiWordPhrases = wordsArray.filter((word) =>
-                    word.includes(" ")
-                );
-                const singleWords = wordsArray.filter(
-                    (word) => !word.includes(" ")
-                );
-                const getRandomWord = () =>
-                    Math.random() < 0.2 && multiWordPhrases.length > 0
-                        ? multiWordPhrases[
-                              Math.floor(
-                                  Math.random() * multiWordPhrases.length
-                              )
-                          ]
-                        : singleWords[
-                              Math.floor(Math.random() * singleWords.length)
-                          ];
-                newWords1 = Array.from({ length: 200 }, getRandomWord);
-            } else {
-                const getRandomWord = () =>
-                    wordsArray[Math.floor(Math.random() * wordsArray.length)];
-                newWords1 = Array.from({ length: 200 }, getRandomWord);
-            }
-            setWordList(newWords1);
-            setCurrentWordIndex(0);
-            setCurrentLetterIndex(0);
-            setLetterStates([]);
-            setTimerRunning(false);
-            setTimerVisible(false);
-            setTime(initialTime);
+        const languageModule = await import(
+            `../src/data/languages/${language}.json`
+        );
+        const wordsArray = languageModule.words;
 
+        const getRandomWord = () =>
+            wordsArray[Math.floor(Math.random() * wordsArray.length)];
+        const newWords = Array.from({ length: 200 }, getRandomWord);
+
+        setWordList(newWords);
+        setCurrentWordIndex(0);
+        setCurrentLetterIndex(0);
+        setLetterStates([]);
+        setTimerRunning(false);
+        setTimerVisible(false);
+        setTime(initialTime);
     };
 
-    const handleRestart = () =>{
+    const handleRestart = () => {
         setAnimate(true);
-        setTimeout(()=>{
+        setTimeout(() => {
             startNewGame();
-        },50)
-    }
-    useEffect(() => {
-        if (animate) {
-            const timer = setTimeout(() => {
-                setAnimate(false);
-            }, 100);
-    
-            return () => clearTimeout(timer);
-        }
-    }, [animate]);
+        }, 50);
+    };
 
     function startTimer() {
         setTimerVisible(true);
         setTimerRunning(true);
     }
+
+    useEffect(() => {
+        if (animate) {
+            const timer = setTimeout(() => {
+                setAnimate(false);
+            }, 100);
+
+            return () => clearTimeout(timer);
+        }
+    }, [animate]);
+
+    useEffect(() => {
+        startNewGame();
+    }, [language, initialTime]);
 
     useEffect(() => {
         localStorage.setItem("theme", JSON.stringify(theme));

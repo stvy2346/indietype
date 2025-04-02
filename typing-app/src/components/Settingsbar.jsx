@@ -37,7 +37,6 @@ const Settingbar = (props) => {
         if (initialTime !== timeOption) {
             setInitialTime(timeOption);
             localStorage.setItem("initialTime", JSON.stringify(timeOption));
-            startNewGame();
         }
     };
     const handleLanguageChange = (e) => {
@@ -46,7 +45,6 @@ const Settingbar = (props) => {
         if (language !== selectedLanguage) {
             setLanguage(selectedLanguage);
             localStorage.setItem("language", JSON.stringify(selectedLanguage));
-            startNewGame();
         }
     };
 

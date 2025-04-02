@@ -300,7 +300,7 @@ const Gameboard = (props) => {
             id="game"
             ref={gameRef}
             className={`p-4 text-zinc-500 rounded-lg ${containerPadding} mb-10 py-2 overflow-hidden ${gameHeight}
-transition-opacity duration-100 ease-out ${
+transition-opacity duration-200 ease-out ${
                 animate ? "opacity-0" : "opacity-100"
             }
                 `}
