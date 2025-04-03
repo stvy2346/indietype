@@ -8,7 +8,7 @@ const Gameboard = (props) => {
         setCurrentWordIndex,
         currentLetterIndex,
         setCurrentLetterIndex,
-        theme,
+        //theme,
         startTimer,
         letterStates,
         setLetterStates,
@@ -232,7 +232,7 @@ const Gameboard = (props) => {
                 }
             }
         }
-        console.log(newLetterStates);
+        //console.log(newLetterStates);
 
         setLetterStates(newLetterStates);
 
@@ -286,14 +286,12 @@ const Gameboard = (props) => {
 
     const getTextClasses = (status) => {
         if (status === "correct")
-            return theme === "Dark" ? "text-white" : "text-stone-700";
+            return "text-[var(--correct)]"
         if (status === "incorrect")
-            return theme === "Dark" ? "text-red-500" : "text-red-600";
+            return "text-[var(--wrong)]"
         if (status === "skipped")
-            return `${
-                theme === "Dark" ? "text-zinc-500" : "text-stone-400"
-            } underline decoration-red-400 decoration-[2px] underline-offset-4`;
-        return theme === "Dark" ? "text-zinc-500" : "text-stone-400";
+            return "text-[var(--skipped)] underline decoration-red-400 decoration-[2px] underline-offset-4";
+        return "text-[var(--default)]";
     };
 
     return (
@@ -337,7 +335,7 @@ transition-opacity duration-200 ease-out ${
                                     letterIndex === currentLetterIndex && (
                                         <Cursor
                                             timerRunning={timerRunning}
-                                            theme={theme}
+                                            //theme={theme}
                                         />
                                     )}
                             </span>
@@ -347,7 +345,7 @@ transition-opacity duration-200 ease-out ${
                                 <span className="letter relative">
                                     <Cursor
                                         timerRunning={timerRunning}
-                                        theme={theme}
+                                        //theme={theme}
                                     />
                                 </span>
                             )}

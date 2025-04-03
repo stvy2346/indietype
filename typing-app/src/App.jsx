@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+
+import {ThemeProvider} from "./context/ThemeContext";
+
 import Header from "./components/Header";
 import Timerorspeed from "./components/Timerorspeed";
 import Restart from "./components/Restart";
@@ -19,7 +22,7 @@ function App() {
         getStoredValue("initialTime", 30)
     );
     const [time, setTime] = useState(initialTime);
-    const [theme, setTheme] = useState(getStoredValue("theme", "Dark"));
+    //const [theme, setTheme] = useState(getStoredValue("theme", "Dark"));
     const [language, setLanguage] = useState(
         getStoredValue("language", "english")
     );
@@ -34,9 +37,13 @@ function App() {
         setAnimate(true);
     
         const languageModule = await import(
-            `../src/data/languages/${language}.json`
-        );
-        const wordsArray = languageModule.words;
+            `./data/languages/${language}.json`
+        ).catch(err => {
+          console.error(`Error loading language module: ${err}`);
+          return { words: ["error", "loading", "words"] };
+        });
+
+        const wordsArray = languageModule.words || [];
     
         let newWords = [];
     
@@ -44,9 +51,9 @@ function App() {
             const randomWord = wordsArray[Math.floor(Math.random() * wordsArray.length)];
             
             if (randomWord.includes(' ')) {
-                newWords.push(...randomWord.split(' '));
+              newWords.push(...randomWord.split(' '));
             } else {
-                newWords.push(randomWord);
+              newWords.push(randomWord);
             }
         }
     
@@ -57,6 +64,8 @@ function App() {
         setTimerRunning(false);
         setTimerVisible(false);
         setTime(initialTime);
+        setCorrect(0);
+        setIncorrect(0);
     };
     
 
@@ -86,9 +95,9 @@ function App() {
         startNewGame();
     }, [language, initialTime]);
 
-    useEffect(() => {
-        localStorage.setItem("theme", JSON.stringify(theme));
-    }, [theme]);
+    // useEffect(() => {
+    //     localStorage.setItem("theme", JSON.stringify(theme));
+    // }, [theme]);
 
     useEffect(() => {
         localStorage.setItem("initialTime", JSON.stringify(initialTime));
@@ -193,70 +202,74 @@ function App() {
     }, [initialTime]);
 
     return (
-        <main
-            className={`${
-                theme === "Dark" ? "bg-zinc-900" : "bg-gray-50"
-            } min-h-screen px-15 py-5`}
-        >
-            <Header theme={theme} startNewGame={startNewGame} />
-            <div className="flex justify-center items-center min-h-[6rem]">
-                {!timerRunning && (
-                    <Settingbar
-                        initialTime={initialTime}
-                        setInitialTime={setInitialTime}
-                        language={language}
-                        setLanguage={setLanguage}
-                        theme={theme}
-                        setTheme={setTheme}
-                        startNewGame={startNewGame}
-                    />
-                )}
-            </div>
-            <div className="px-20 mb-4 min-h-[40px]">
-                {timerVisible && (
-                    <Timerorspeed
-                        time={time}
-                        timerRunning={timerRunning}
-                        setTimerRunning={setTimerRunning}
-                        theme={theme}
-                    />
-                )}
-            </div>
-            {time > 0 ? (
-                <Gameboard
-                    wordList={wordList}
-                    setWordList={setWordList}
-                    letterStates={letterStates}
-                    setLetterStates={setLetterStates}
-                    currentWordIndex={currentWordIndex}
-                    currentLetterIndex={currentLetterIndex}
-                    setCurrentWordIndex={setCurrentWordIndex}
-                    setCurrentLetterIndex={setCurrentLetterIndex}
-                    startNewGame={startNewGame}
-                    theme={theme}
-                    startTimer={startTimer}
-                    time={time}
-                    correct={correct}
-                    setCorrect={setCorrect}
-                    incorrect={incorrect}
-                    setIncorrect={setIncorrect}
-                    timerRunning={timerRunning}
-                    animate={animate}
-                />
-            ) : (
-                <Results
-                    // getWPM={getWPM}
-                    initialTime={initialTime}
-                    getTypingStats={getTypingStats}
-                    // getRawSpeed={getRawSpeed}
-                    theme={theme}
-                    // getAccuracy={getAccuracy}
-                />
-            )}
-            <div className="flex flex-col justify-center items-center">
-                <Restart onRestart={handleRestart} theme={theme} />
-            </div>
-        </main>
+        <ThemeProvider>
+            <main className="min-h-screen px-15 py-5 bg-[var(--bg)]">
+              <Header 
+                //theme={theme} 
+                startNewGame={startNewGame} 
+              />
+              <div className="flex justify-center items-center min-h-[6rem]">
+                  {!timerRunning && (
+                      <Settingbar
+                          initialTime={initialTime}
+                          setInitialTime={setInitialTime}
+                          language={language}
+                          setLanguage={setLanguage}
+                          //theme={theme}
+                          //setTheme={setTheme}
+                          startNewGame={startNewGame}
+                      />
+                  )}
+              </div>
+              <div className="px-20 mb-4 min-h-[40px]">
+                  {timerVisible && (
+                      <Timerorspeed
+                          time={time}
+                          timerRunning={timerRunning}
+                          setTimerRunning={setTimerRunning}
+                          //theme={theme}
+                      />
+                  )}
+              </div>
+              {time > 0 ? (
+                  <Gameboard
+                      wordList={wordList}
+                      setWordList={setWordList}
+                      letterStates={letterStates}
+                      setLetterStates={setLetterStates}
+                      currentWordIndex={currentWordIndex}
+                      currentLetterIndex={currentLetterIndex}
+                      setCurrentWordIndex={setCurrentWordIndex}
+                      setCurrentLetterIndex={setCurrentLetterIndex}
+                      startNewGame={startNewGame}
+                      //theme={theme}
+                      startTimer={startTimer}
+                      time={time}
+                      correct={correct}
+                      setCorrect={setCorrect}
+                      incorrect={incorrect}
+                      setIncorrect={setIncorrect}
+                      timerRunning={timerRunning}
+                      animate={animate}
+                  />
+              ) : (
+                  <Results
+                      // getWPM={getWPM}
+                      initialTime={initialTime}
+                      getTypingStats={getTypingStats}
+                      // getRawSpeed={getRawSpeed}
+                      //theme={theme}
+                      // getAccuracy={getAccuracy}
+                  />
+              )}
+              <div className="flex flex-col justify-center items-center">
+                  <Restart 
+                    onRestart={handleRestart} 
+                    //theme={theme} 
+                  />
+              </div>
+          </main>
+        </ThemeProvider>
     );
 }
 

@@ -3,12 +3,14 @@ import { FaBug } from "react-icons/fa";
 
 
 const Header = (props) =>{
-    const {theme,startNewGame} = props;
+    const {startNewGame} = props;
     return(
-        <div className={`${theme === "Dark" ? "text-blue-600" : "text-stone-800"} py-10 mb-1 px-20`}>
-            <div className="text-3xl flex justify-start gap-2 cursor-pointer" onClick={startNewGame}>
-            <FaBug />
-            <p>TypeSprint</p>
+        <div className={"text-[var(--heading)] py-10 mb-1 px-20"}>
+            <div className="text-3xl flex justify-start gap-2 cursor-pointer items-center" onClick={startNewGame}>
+                <div className="text-3xl flex items-center">
+                    <FaBug />
+                </div>
+                <p>TypeSprint</p>
             </div>
         </div>
     )

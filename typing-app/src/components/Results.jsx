@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 const Results = (props) => {
-    const { initialTime, theme, getTypingStats } = props;
+    const { initialTime, getTypingStats } = props;
     const stats = getTypingStats();
 
     return (
@@ -9,27 +9,35 @@ const Results = (props) => {
             <StatItem
                 label="wpm"
                 value={stats.wpm}
-                theme={theme}
+                // theme={theme}
             />
             <StatItem
                 label="accuracy"
                 value={`${Math.floor(stats.accuracy)}%`}
-                theme={theme}
+                // theme={theme}
                 hoverText={`${stats.accuracy}% \n ${stats.correctWords} correct \n${stats.incorrectWords} incorrect`}
             />
             <StatItem
                 label="characters"
                 value={`${stats.correctChars}/${stats.incorrectChars}/${stats.skippedChars}`}
-                theme={theme}
+                // theme={theme}
                 hoverText={`correct \n incorrect \nskipped`}
             />
-            <StatItem label="raw" value={stats.rawSpeed} theme={theme} />
-            <StatItem label="time" value={`${initialTime}s`} theme={theme} />
+            <StatItem 
+                label="raw" 
+                value={stats.rawSpeed} 
+                // theme={theme} 
+            />
+            <StatItem 
+                label="time" 
+                value={`${initialTime}s`} 
+                // theme={theme} 
+            />
         </div>
     );
 };
 
-const StatItem = ({ label, value, theme, hoverText }) => {
+const StatItem = ({ label, value, hoverText }) => {
     const [showHover, setShowHover] = useState(false);
 
     return (
@@ -44,9 +52,7 @@ const StatItem = ({ label, value, theme, hoverText }) => {
                 {label}
             </div>
             <div
-                className={`${
-                    theme === "Dark" ? "text-blue-500" : "text-stone-700"
-                } text-xl sm:text-2xl md:text-4xl lg:text-5xl xl:text-6xl font-bold`}
+                className="text-[var(--text-active)] text-xl sm:text-2xl md:text-4xl lg:text-5xl xl:text-6xl font-bold"
             >
                 {value}
             </div>

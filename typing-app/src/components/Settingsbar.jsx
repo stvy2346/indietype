@@ -1,17 +1,21 @@
 import React, { useState } from "react";
+import ThemeToggle from "./ThemeToggleButton";
+import { useTheme } from "../context/ThemeContext";
+
 
 const Settingbar = (props) => {
     const {
         initialTime,
         setInitialTime,
-        theme,
-        setTheme,
         language,
         setLanguage,
     } = props;
+
+    const {theme} = useTheme();
+
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const timeOptions = [15, 30, 45, 60];
-    const themeOptions = ["Light", "Dark"];
+    //const themeOptions = ["Light", "Dark"];
     const languageOptions = [
         { value: "english", label: "English" },
         { value: "english_1k", label: "English 1K" },
@@ -28,10 +32,10 @@ const Settingbar = (props) => {
         { value: "brainrot", label: "Brainrot" },
     ];
 
-    const handleThemeChange = (themeOption) => {
-        setTheme(themeOption);
-        localStorage.setItem("theme", JSON.stringify(themeOption));
-    };
+    // const handleThemeChange = (themeOption) => {
+    //     setTheme(theme === "Dark" ? "Light" : "Dark")
+    //     localStorage.setItem("theme", JSON.stringify(themeOption));
+    // };
 
     const handleTimeChange = (timeOption) => {
         if (initialTime !== timeOption) {
@@ -62,26 +66,20 @@ const Settingbar = (props) => {
                             key={timeOption}
                             className={`${
                                 initialTime === timeOption
-                                    ? theme === "Dark"
-                                        ? "text-blue-500"
-                                        : "text-stone-700"
-                                    : ""
-                            } 
-                                ${
-                                    theme === "Dark"
-                                        ? "hover:text-white"
-                                        : "hover:text-stone-600"
-                                }`}
+                                    ? "text-[var(--text-active)]"
+                                    : "text-[var(--default)]"
+                                } 
+                                hover:text-[var(--text-hover)]
+                            `}
                             onClick={() => handleTimeChange(timeOption)}
                         >
                             {timeOption}
                         </button>
                     ))}
                 </div>
+                
                 <div
-                    className={`${
-                        theme === "Dark" ? "text-zinc-500" : "text-stone-400"
-                    } text-2xl hidden md:block`}
+                    className="text-2xl hidden md:block text-[var(--default)]"
                 >
                     |
                 </div>
@@ -90,16 +88,12 @@ const Settingbar = (props) => {
                     <select
                         value={language || "english"}
                         onChange={handleLanguageChange}
-                        className={`
-                            ${
-                            theme === "Dark"
-                                ? "bg-zinc-700 text-blue-500 border-zinc-500"
-                                : "bg-stone-200 text-stone-700 border-stone-300"
-                        } 
-                            border rounded px-2 py-1 border-none focus:outline-none w-full md:w-auto`}
+                        className="
+                            bg-[var(--settingBg)] text-[var(--text-active)] border-[var(--default)] hover:text-[var(--text-hover)]
+                            border rounded px-2 py-1 border-none focus:outline-none w-full md:w-auto"
                     >
                         {languageOptions.map((option) => (
-                            <option key={option.value} value={option.value} className={`${theme === "Dark" ? "text-white" : "text-stone-700"} `}>
+                            <option key={option.value} value={option.value} className="text-[var(--text)]">
                                 {option.label}
                             </option>
                         ))}
@@ -107,34 +101,13 @@ const Settingbar = (props) => {
                 </div>
 
                 <div
-                    className={`${
-                        theme === "Dark" ? "text-zinc-500" : "text-stone-400"
-                    } text-2xl hidden md:block`}
+                    className="text-2xl hidden md:block text-[var(--default)]"
                 >
                     |
                 </div>
 
                 <div className="flex gap-5">
-                    {themeOptions.map((themeOption) => (
-                        <button
-                            key={themeOption}
-                            className={`${
-                                theme === themeOption
-                                    ? theme === "Dark"
-                                        ? "text-blue-500"
-                                        : "text-stone-700"
-                                    : ""
-                            } 
-                            ${
-                                theme === "Dark"
-                                    ? "hover:text-white"
-                                    : "hover:text-stone-600"
-                            }`}
-                            onClick={() => handleThemeChange(themeOption)}
-                        >
-                            {themeOption}
-                        </button>
-                    ))}
+                    <ThemeToggle/>
                 </div>
             </div>
         </>
@@ -145,11 +118,7 @@ const Settingbar = (props) => {
             <div className="md:hidden mb-4">
                 <button
                     onClick={togglePopup}
-                    className={`${
-                        theme === "Dark"
-                            ? "bg-zinc-700 text-white"
-                            : "bg-stone-200 text-stone-700"
-                    } px-4 py-2 rounded-md flex items-center justify-center w-full`}
+                    className="bg-[var(--settingBg)] text-[var(--text)] px-4 py-2 rounded-md flex items-center justify-center w-full"
                 >
                     Settings
                 </button>
@@ -158,29 +127,17 @@ const Settingbar = (props) => {
             {isPopupOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 md:hidden">
                     <div
-                        className={`${
-                            theme === "Dark"
-                                ? "bg-zinc-800 text-zinc-500"
-                                : "bg-white text-stone-400"
-                        } p-5 rounded-lg w-11/12 max-w-sm`}
+                        className="bg-[var(--settingBg)] text-[var(--default)] p-5 rounded-lg w-11/12 max-w-sm"
                     >
                         <div className="flex justify-between items-center mb-4">
                             <h3
-                                className={`${
-                                    theme === "Dark"
-                                        ? "text-white"
-                                        : "text-stone-700"
-                                } font-medium`}
+                                className="text-[var(--text)] font-medium"
                             >
                                 Settings
                             </h3>
                             <button
                                 onClick={togglePopup}
-                                className={`${
-                                    theme === "Dark"
-                                        ? "text-white"
-                                        : "text-stone-700"
-                                }`}
+                                className="text-[var(--text)]"
                             >
                                 ✕
                             </button>
@@ -191,11 +148,7 @@ const Settingbar = (props) => {
             )}
 
             <div
-                className={`${
-                    theme === "Dark"
-                        ? "bg-zinc-700 text-zinc-500"
-                        : "bg-stone-200 text-stone-400"
-                } px-4 py-2 rounded-md items-center max-w-[32rem] gap-5 mb-10 hidden md:flex`}
+                className="bg-[var(--settingBg)] text-[var(--default)] px-4 py-2 rounded-md items-center max-w-[32rem] gap-5 mb-10 hidden md:flex"
             >
                 {renderSettingsContent()}
             </div>

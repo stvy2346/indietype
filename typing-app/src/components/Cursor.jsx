@@ -29,8 +29,8 @@ const Cursor = (props) => {
         absolute
         w-0.5
         ${heightClass}
-        ${theme === "Dark" ? "bg-blue-500" : "bg-stone-700"}
         ${!timerRunning && "animate-blink"}
+        bg-[var(--cursor)]
         `}
         />
   );
