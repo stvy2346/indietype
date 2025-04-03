@@ -46,7 +46,7 @@ const Settingbar = (props) => {
 
     const handleLanguageChange = (e) => {
         const selectedLanguage = e.target.value;
-        console.log(selectedLanguage);
+        //console.log(selectedLanguage);
         if (language !== selectedLanguage) {
             setLanguage(selectedLanguage);
             localStorage.setItem("language", JSON.stringify(selectedLanguage));
