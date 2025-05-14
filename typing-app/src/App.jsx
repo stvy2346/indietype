@@ -32,6 +32,7 @@ function App() {
     const [correct, setCorrect] = useState(0);
     const [incorrect, setIncorrect] = useState(0);
     const [animate, setAnimate] = useState(false);
+    const [isCapsLockOn,setIsCapsLockOn] = useState(false);
 
     const startNewGame = async () => {
         setAnimate(true);
@@ -102,6 +103,21 @@ function App() {
     useEffect(() => {
         localStorage.setItem("initialTime", JSON.stringify(initialTime));
     }, [initialTime]);
+
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+        if (e.getModifierState) {
+            const capsOn = e.getModifierState('CapsLock');
+            setIsCapsLockOn(capsOn);
+        }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
+
 
     // function getWPM(){
     //   const correctWords = letterStates.filter((wordState)=>{
@@ -221,15 +237,22 @@ function App() {
                       />
                   )}
               </div>
-              <div className="px-20 mb-4 min-h-[40px]">
-                  {timerVisible && (
-                      <Timerorspeed
-                          time={time}
-                          timerRunning={timerRunning}
-                          setTimerRunning={setTimerRunning}
-                          //theme={theme}
-                      />
-                  )}
+              <div className="relative px-20 mb-4 min-h-[40px] flex items-center">
+                {timerVisible && (
+                    <div className="flex-shrink-0">
+                    <Timerorspeed
+                        time={time}
+                        timerRunning={timerRunning}
+                        setTimerRunning={setTimerRunning}
+                    />
+                    </div>
+                )}
+
+                {isCapsLockOn && time > 0 && (
+                    <div className="absolute left-1/2 transform -translate-x-1/2 bg-[var(--settingBg)] px-5 py-3 rounded-md text-[var(--text-active)]">
+                        Caps Lock On
+                    </div>
+                )}
               </div>
               {time > 0 ? (
                   <Gameboard
@@ -251,6 +274,8 @@ function App() {
                       setIncorrect={setIncorrect}
                       timerRunning={timerRunning}
                       animate={animate}
+                      isCapsLockOn={isCapsLockOn}
+                      setIsCapsLockOn={setIsCapsLockOn}
                   />
               ) : (
                   <Results

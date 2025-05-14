@@ -51,11 +51,11 @@ button{
 */
 /* Default light theme */
 :root {
-  --bg: #F9FAFB;
+  --bg: #f1f5f9;
   --text: black;
   --text-active: #57534e; /* stone-700 */
   --text-hover: #44403c; /* stone-600 */
-  --correct: #57534E; /* stone-700 */
+  --correct: #292524; /* stone-700 */
   --wrong: #dc2626; /* red-600 */
   --skipped: #A8A29E; /* stone-400 */
   --langOpt:#57534E; /* stone-700 */
@@ -81,7 +81,7 @@ button{
   --default: #71717A; /* zinc-500 */
   --settingBg: #3f3f46; /*zinc-700*/
   --heading: #2563eb; /*blue-600*/
-  --timer: white;
+  --timer: #e0f2fe;
   --cursor: #3b82f6; /* blue-500 */
   --restart: #71717A; /* zinc-500 */
   --restart-hover: #3b82f6; /* blue-500 */

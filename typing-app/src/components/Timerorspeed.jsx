@@ -11,9 +11,9 @@ const Timerorspeed = (props) =>{
       }, [time, timerRunning, setTimerRunning]);
     
     if(timerRunning){
-        return <div className="text-[var(--text)] text-4xl">{time}</div>
+        return <div className="text-[var(--timer)] text-4xl">{time}</div>
     }else{
-        return <div className="text-[var(--text-active)] text-4xl">Results:</div>
+        return <div className="text-[var(--text-active)] text-3xl md:text-4xl font-semibold mx-2 md:mx-8 lg:mx-16 mt-16">Results:</div>
     }
 }
 

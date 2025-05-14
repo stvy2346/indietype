@@ -90,7 +90,7 @@ const Settingbar = (props) => {
                         onChange={handleLanguageChange}
                         className="
                             bg-[var(--settingBg)] text-[var(--text-active)] border-[var(--default)] hover:text-[var(--text-hover)]
-                            border rounded px-2 py-1 border-none focus:outline-none w-full md:w-auto"
+                            border rounded px-2 py-1 border-none focus:outline-none w-full md:w-auto cursor-pointer"
                     >
                         {languageOptions.map((option) => (
                             <option key={option.value} value={option.value} className="text-[var(--text)]">
@@ -125,7 +125,7 @@ const Settingbar = (props) => {
             </div>
 
             {isPopupOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 md:hidden">
+                <div className="fixed inset-0 bg-[var-(--bg)] bg-opacity-50 flex items-center justify-center z-50 md:hidden">
                     <div
                         className="bg-[var(--settingBg)] text-[var(--default)] p-5 rounded-lg w-11/12 max-w-sm"
                     >
