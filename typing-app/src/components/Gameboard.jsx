@@ -18,12 +18,14 @@ const Gameboard = (props) => {
         incorrect,
         setIncorrect,
         timerRunning,
+        setTimerRunning,
         animate,
     } = props;
 
     const lastExecutionTime = useRef(0);
     const wordsContainerRef = useRef(null);
     const gameRef = useRef(null);
+    const mouseMoveTimeoutRef = useRef(null);
 
     const [fontSize, setFontSize] = useState("text-2xl");
     const [containerPadding, setContainerPadding] = useState("mx-4");
@@ -32,12 +34,10 @@ const Gameboard = (props) => {
         "min-h-[7.75rem] max-h-[7.75rem]"
     );
 
-
-
     useEffect(() => {
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [currentWordIndex, currentLetterIndex, letterStates]);
+    }, [currentWordIndex, currentLetterIndex, letterStates, timerRunning]);
 
     const isWordCorrect = (wordIndex) => {
         if (!letterStates[wordIndex]) return false;
@@ -63,6 +63,27 @@ const Gameboard = (props) => {
     useEffect(() => {
         setTimeout(resetPositionOnResize, 100);
     }, [fontSize]);
+
+    useEffect(() => {
+        function handleMouseMove() {
+            if (timerRunning) {
+                setTimerRunning(false);
+
+                // Clear any existing timeout
+                if (mouseMoveTimeoutRef.current) {
+                    clearTimeout(mouseMoveTimeoutRef.current);
+                }
+
+                // Set a small debounce timeout to prevent constant triggers
+                mouseMoveTimeoutRef.current = setTimeout(() => {
+                    mouseMoveTimeoutRef.current = null;
+                }, 100);
+            }
+        }
+
+        window.addEventListener("mousemove", handleMouseMove);
+        return () => window.removeEventListener("mousemove", handleMouseMove);
+    }, [timerRunning, setTimerRunning]);
 
     useLayoutEffect(() => {
         function handleResize() {
@@ -126,6 +147,9 @@ const Gameboard = (props) => {
     }
 
     function handleKeyDown(e) {
+        if (!timerRunning && time > 0) {
+            setTimerRunning(true);
+        }
         if (
             !wordList.length ||
             currentWordIndex >= wordList.length ||
@@ -172,11 +196,12 @@ const Gameboard = (props) => {
                 newLetterStates[currentWordIndex][currentLetterIndex] =
                     e.key === expectedLetter ? "correct" : "incorrect";
                 setCurrentLetterIndex((prev) => prev + 1);
-            } else if (newLetterStates[currentWordIndex].length < currentWord.length) {
+            } else if (
+                newLetterStates[currentWordIndex].length < currentWord.length
+            ) {
                 newLetterStates[currentWordIndex].push("incorrect");
             }
         }
-        
 
         if (isSpace && currentLetterIndex > 0) {
             if (expectedLetter !== " ") {
@@ -285,10 +310,8 @@ const Gameboard = (props) => {
     }
 
     const getTextClasses = (status) => {
-        if (status === "correct")
-            return "text-[var(--correct)]"
-        if (status === "incorrect")
-            return "text-[var(--wrong)]"
+        if (status === "correct") return "text-[var(--correct)]";
+        if (status === "incorrect") return "text-[var(--wrong)]";
         if (status === "skipped")
             return "text-[var(--skipped)] underline decoration-red-400 decoration-[2px] underline-offset-4";
         return "text-[var(--default)]";
