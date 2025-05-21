@@ -10,7 +10,7 @@ const Header = (props) =>{
                 <div className="text-3xl flex items-center">
                     <FaBug />
                 </div>
-                <p>TypeSprint</p>
+                <p>IndieType</p>
             </div>
         </div>
     )
