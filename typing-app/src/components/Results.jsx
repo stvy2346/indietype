@@ -14,18 +14,16 @@ const Results = (props) => {
             <StatItem
                 label="accuracy"
                 value={`${Math.floor(stats.accuracy)}%`}
-                // theme={theme}
-                hoverText={`${stats.accuracy}% \n ${stats.correctWords} correct \n${stats.incorrectWords} incorrect`}
             />
             <StatItem
                 label="characters"
-                value={`${stats.correctChars}/${stats.incorrectChars}/${stats.skippedChars}`}
+                value={`${stats.correctChars}/${stats.incorrectChars}/${stats.missedChars}`}
                 // theme={theme}
-                hoverText={`correct \n incorrect \nskipped`}
+                hoverText={`correct \n incorrect \nmissed`}
             />
             <StatItem 
                 label="raw" 
-                value={stats.rawSpeed} 
+                value={stats.rawWpm} 
                 // theme={theme} 
             />
             <StatItem 

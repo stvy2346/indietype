@@ -13,10 +13,8 @@ const Gameboard = (props) => {
         letterStates,
         setLetterStates,
         time,
-        correct,
-        setCorrect,
-        incorrect,
-        setIncorrect,
+        firstAttemptStates,
+        setFirstAttemptStates,
         timerRunning,
         setTimerRunning,
         animate,
@@ -181,48 +179,76 @@ const Gameboard = (props) => {
 
         const currentWord = wordList[currentWordIndex].split("");
         const currentLetter = currentWord[currentLetterIndex];
-        const expectedLetter = currentLetter || " ";
         const isLetter = e.key.length === 1 && e.key !== " ";
         const isSpace = e.key === " ";
         const isBackspace = e.key === "Backspace";
 
         let newLetterStates = [...letterStates];
+        let newFirstAttemptStates = [...firstAttemptStates]; // Track first attempts for accuracy
+
         if (!newLetterStates[currentWordIndex]) {
             newLetterStates[currentWordIndex] = [];
+        }
+        if (!newFirstAttemptStates[currentWordIndex]) {
+            newFirstAttemptStates[currentWordIndex] = [];
         }
 
         if (isLetter) {
             if (currentLetter) {
+                const isCorrect = e.key === currentLetter;
+                const currentState =
+                    newLetterStates[currentWordIndex][currentLetterIndex];
+                const hasBeenAttempted =
+                    newFirstAttemptStates[currentWordIndex][
+                        currentLetterIndex
+                    ] !== undefined;
+
+                if (!hasBeenAttempted) {
+                    newFirstAttemptStates[currentWordIndex][
+                        currentLetterIndex
+                    ] = isCorrect ? "correct" : "incorrect";
+                }
+
                 newLetterStates[currentWordIndex][currentLetterIndex] =
-                    e.key === expectedLetter ? "correct" : "incorrect";
+                    isCorrect ? "correct" : "incorrect";
                 setCurrentLetterIndex((prev) => prev + 1);
-            } else if (
-                newLetterStates[currentWordIndex].length < currentWord.length
-            ) {
-                newLetterStates[currentWordIndex].push("incorrect");
+            } else {
+                const extraIndex = newLetterStates[currentWordIndex].length;
+                newLetterStates[currentWordIndex].push("extra");
+                newFirstAttemptStates[currentWordIndex][extraIndex] = "extra";
             }
         }
 
-        if (isSpace && currentLetterIndex > 0) {
-            if (expectedLetter !== " ") {
-                newLetterStates[currentWordIndex] = currentWord.map(
-                    (_, index) =>
-                        newLetterStates[currentWordIndex][index] === "correct"
-                            ? "correct"
-                            : newLetterStates[currentWordIndex][index] ===
-                              "incorrect"
-                            ? "incorrect"
-                            : "skipped"
-                );
+if (isSpace) {
+    if (currentWordIndex < wordList.length) {
+        for (let i = currentLetterIndex; i < currentWord.length; i++) {
+            if (!newLetterStates[currentWordIndex][i]) {
+                newLetterStates[currentWordIndex][i] = "missed";
+                newFirstAttemptStates[currentWordIndex][i] = "missed";
             }
-            setCurrentWordIndex((prev) => prev + 1);
-            setCurrentLetterIndex(0);
         }
+
+        setCurrentWordIndex((prev) => prev + 1);
+        setCurrentLetterIndex(0);
+    }
+}
+
 
         if (isBackspace) {
             if (currentLetterIndex > 0) {
+                const prevIndex = currentLetterIndex - 1;
+
+                if (newLetterStates[currentWordIndex][prevIndex] === "extra") {
+                    newLetterStates[currentWordIndex].splice(prevIndex, 1);
+                    newFirstAttemptStates[currentWordIndex].splice(
+                        prevIndex,
+                        1
+                    );
+                } else {
+                    newLetterStates[currentWordIndex][prevIndex] = "";
+                }
+
                 setCurrentLetterIndex((prev) => prev - 1);
-                newLetterStates[currentWordIndex][currentLetterIndex - 1] = "";
             } else if (currentWordIndex > 0) {
                 const prevWordCorrect = isWordCorrect(currentWordIndex - 1);
                 if (prevWordCorrect) return;
@@ -250,19 +276,33 @@ const Gameboard = (props) => {
 
                     if (isOnSameLine || isPreviousLineVisible) {
                         setCurrentWordIndex((prev) => prev - 1);
-                        setCurrentLetterIndex(
-                            wordList[currentWordIndex - 1].length
-                        );
+
+                        const prevWordStates =
+                            newLetterStates[currentWordIndex - 1] || [];
+                        let lastTypedIndex = prevWordStates.length;
+
+                        while (
+                            lastTypedIndex > 0 &&
+                            prevWordStates[lastTypedIndex - 1] === "missed"
+                        ) {
+                            newLetterStates[currentWordIndex - 1][
+                                lastTypedIndex - 1
+                            ] = "";
+                            newFirstAttemptStates[currentWordIndex - 1][
+                                lastTypedIndex - 1
+                            ] = undefined;
+                            lastTypedIndex--;
+                        }
+
+                        setCurrentLetterIndex(lastTypedIndex);
                     }
                 }
             }
         }
-        //console.log(newLetterStates);
+        console.log(newLetterStates);
 
         setLetterStates(newLetterStates);
-
-        if (e.key === expectedLetter) setCorrect(correct + 1);
-        else setIncorrect(incorrect + 1);
+        setFirstAttemptStates(newFirstAttemptStates);
     }
 
     // function updateCursorPosition(){
@@ -312,7 +352,7 @@ const Gameboard = (props) => {
     const getTextClasses = (status) => {
         if (status === "correct") return "text-[var(--correct)]";
         if (status === "incorrect") return "text-[var(--wrong)]";
-        if (status === "skipped")
+        if (status === "missed")
             return "text-[var(--skipped)] underline decoration-red-400 decoration-[2px] underline-offset-4";
         return "text-[var(--default)]";
     };

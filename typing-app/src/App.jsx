@@ -30,9 +30,8 @@ function App() {
     );
     const [timerRunning, setTimerRunning] = useState(false);
     const [letterStates, setLetterStates] = useState([]);
+    const [firstAttemptStates,setFirstAttemptStates] = useState([]);
     const [timerVisible, setTimerVisible] = useState(false);
-    const [correct, setCorrect] = useState(0);
-    const [incorrect, setIncorrect] = useState(0);
     const [animate, setAnimate] = useState(false);
     const [isCapsLockOn, setIsCapsLockOn] = useState(false);
 
@@ -68,8 +67,6 @@ function App() {
         setTimerRunning(false);
         setTimerVisible(false);
         setTime(initialTime);
-        setCorrect(0);
-        setIncorrect(0);
     };
 
     const handleRestart = () => {
@@ -138,67 +135,112 @@ function App() {
     function getTypingStats() {
         let correctChars = 0;
         let incorrectChars = 0;
-        let skippedChars = 0;
-        let spaces = 0;
+        let extraChars = 0;
+        let missedChars = 0;
         let correctWords = 0;
-        let incorrectWords = 0;
+        let totalWords = 0;
 
-        spaces = currentWordIndex > 0 ? currentWordIndex - 1 : 0;
+        const completedWordCount = Math.min(currentWordIndex, wordList.length);
 
-        letterStates.forEach((wordState) => {
-            if (!wordState) return;
+        for (let wordIndex = 0; wordIndex < completedWordCount; wordIndex++) {
+            const originalWord = wordList[wordIndex];
+            const firstAttempts = firstAttemptStates[wordIndex] || [];
+            const currentStates = letterStates[wordIndex] || [];
 
-            let wordCorrect = true;
+            if (firstAttempts.length === 0) continue; // Word never attempted
 
-            wordState.forEach((letterState) => {
-                if (letterState === "correct") {
+            let wordHasError = false;
+            let wordCompleted = false;
+
+            for (
+                let charIndex = 0;
+                charIndex < originalWord.length;
+                charIndex++
+            ) {
+                const firstAttempt = firstAttempts[charIndex];
+
+                if (firstAttempt === "correct") {
                     correctChars++;
-                } else if (letterState === "incorrect") {
+                } else if (firstAttempt === "incorrect") {
                     incorrectChars++;
-                    wordCorrect = false;
-                } else if (letterState === "skipped") {
-                    skippedChars++;
-                    wordCorrect = false;
+                    wordHasError = true;
+                } else if (firstAttempt === "missed") {
+                    missedChars++;
+                    wordHasError = true;
                 }
-            });
-
-            if (wordCorrect && wordState.length > 0) {
-                correctWords++;
-            } else if (!wordCorrect) {
-                incorrectWords++;
             }
-        });
+
+            for (let i = originalWord.length; i < firstAttempts.length; i++) {
+                if (firstAttempts[i] === "extra") {
+                    extraChars++;
+                    wordHasError = true;
+                }
+            }
+
+            const wordTypedLength = Math.min(
+                firstAttempts.length,
+                originalWord.length
+            );
+            const allCorrect = firstAttempts
+                .slice(0, originalWord.length)
+                .every((state) => state === "correct");
+            const rightLength =
+                firstAttempts.filter((state) => state !== "extra").length ===
+                originalWord.length;
+
+            wordCompleted = wordTypedLength === originalWord.length;
+
+            if (wordCompleted && allCorrect && rightLength && !wordHasError) {
+                correctWords++;
+            }
+
+            totalWords++;
+        }
+
+        const elapsedTime = Math.max(initialTime - time, 1); // Prevent division by zero
+        const timeInMinutes = elapsedTime / 60;
+
+        const totalTypedChars = correctChars + incorrectChars;
 
         const wpm =
-            correctChars > 5
-                ? Math.round((correctChars / 5) * (60 / initialTime))
+            timeInMinutes > 0
+                ? Math.round(correctChars / 5 / timeInMinutes)
                 : 0;
 
-        const rawSpeed =
-            correctChars + incorrectChars > 5
-                ? Math.round(
-                      ((correctChars + incorrectChars) / 5) * (60 / initialTime)
-                  )
+        const rawWpm =
+            timeInMinutes > 0
+                ? Math.round(totalTypedChars / 5 / timeInMinutes)
                 : 0;
 
-        const totalAttempted = correctChars + incorrectChars;
         const accuracy =
-            totalAttempted > 0
-                ? ((correctChars / totalAttempted) * 100).toFixed(2)
+            totalTypedChars > 0
+                ? ((correctChars / totalTypedChars) * 100).toFixed(2)
+                : "100.00";
+
+        const allCharsAttempted =
+            correctChars + incorrectChars + extraChars + missedChars;
+        const rawAccuracy =
+            allCharsAttempted > 0
+                ? ((correctChars / allCharsAttempted) * 100).toFixed(2)
                 : "100.00";
 
         return {
             wpm,
-            rawSpeed,
-            accuracy,
+            rawWpm,
+            accuracy: parseFloat(accuracy),
+            rawAccuracy: parseFloat(rawAccuracy),
             correctChars,
             incorrectChars,
-            skippedChars,
-            spaces,
+            extraChars,
+            missedChars,
             correctWords,
-            incorrectWords,
+            totalWords,
+            elapsedTime,
+            timeInMinutes,
+            totalTypedChars,
         };
     }
+
 
     useEffect(() => {
         if (time > 0 && timerRunning) {
@@ -253,7 +295,9 @@ function App() {
                         <div className="absolute flex left-1/2 transform -translate-x-1/2 bg-[var(--settingBg)] px-5 py-3 rounded-md text-[var(--text-active)]">
                             <div className="flex items-center gap-2">
                                 <FaLock />
-                                <span className="transform translate-y-[1px]">Caps Lock</span>
+                                <span className="transform translate-y-[1px]">
+                                    Caps Lock
+                                </span>
                             </div>
                         </div>
                     )}
@@ -264,6 +308,8 @@ function App() {
                         setWordList={setWordList}
                         letterStates={letterStates}
                         setLetterStates={setLetterStates}
+                        firstAttemptStates={firstAttemptStates}
+                        setFirstAttemptStates={setFirstAttemptStates}
                         currentWordIndex={currentWordIndex}
                         currentLetterIndex={currentLetterIndex}
                         setCurrentWordIndex={setCurrentWordIndex}
@@ -272,10 +318,6 @@ function App() {
                         //theme={theme}
                         startTimer={startTimer}
                         time={time}
-                        correct={correct}
-                        setCorrect={setCorrect}
-                        incorrect={incorrect}
-                        setIncorrect={setIncorrect}
                         timerRunning={timerRunning}
                         setTimerRunning={setTimerRunning}
                         animate={animate}
