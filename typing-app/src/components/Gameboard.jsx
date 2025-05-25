@@ -39,18 +39,6 @@ const Gameboard = (props) => {
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [currentWordIndex, currentLetterIndex, letterStates, timerRunning]);
 
-    const isWordCorrect = (wordIndex) => {
-        if (!letterStates[wordIndex]) return false;
-
-        const word = wordList[wordIndex].split("");
-        return word.every(
-            (letter, index) => letterStates[wordIndex][index] === "correct"
-        );
-    };
-
-    // useEffect(()=>{
-    //   updateCursorPosition();
-    // },[currentLetterIndex,currentWordIndex]);
 
     useEffect(() => {
         const now = Date.now();
@@ -261,12 +249,7 @@ const Gameboard = (props) => {
                 const currentWordElement =
                     document.querySelectorAll(".word")[currentWordIndex];
 
-                // Heuristic for line breaks to decide if backspace should go to previous line
-                // This part is highly dependent on your CSS and layout.
-                // The existing logic seems to attempt to determine if the previous word is
-                // on the same visual line or an immediately preceding visible line.
-                // If the element references are not reliable or lead to unexpected behavior,
-                // you might need to adjust this based on your rendering.
+
                 if (
                     previousWordElement &&
                     currentWordElement &&
@@ -294,14 +277,13 @@ const Gameboard = (props) => {
                             newLetterStates[prevWordIndex] || [];
                         let lastTypedIndex = prevWordStates.length;
 
-                        // Find the last typed character that is not empty or missed
                         while (
                             lastTypedIndex > 0 &&
                             (prevWordStates[lastTypedIndex - 1] === "missed" ||
                                 prevWordStates[lastTypedIndex - 1] === "")
                         ) {
                             newLetterStates[prevWordIndex][lastTypedIndex - 1] =
-                                ""; // Clear for display
+                                "";
                             lastTypedIndex--;
                         }
                         setCurrentLetterIndex(lastTypedIndex);
@@ -309,9 +291,9 @@ const Gameboard = (props) => {
                 }
             }
         }
-        console.log(newLetterStates);
-        console.log(newFirstAttemptStates);
-        console.log(newWrongSpaces);
+        // console.log(newLetterStates);
+        // console.log(newFirstAttemptStates);
+        // console.log(newWrongSpaces);
 
         setLetterStates(newLetterStates);
         setFirstAttemptStates(newFirstAttemptStates);
