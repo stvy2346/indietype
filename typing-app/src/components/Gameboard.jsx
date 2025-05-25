@@ -12,6 +12,8 @@ const Gameboard = (props) => {
         startTimer,
         letterStates,
         setLetterStates,
+        wrongSpaces,
+        setWrongSpaces,
         time,
         firstAttemptStates,
         setFirstAttemptStates,
@@ -145,16 +147,6 @@ const Gameboard = (props) => {
     }
 
     function handleKeyDown(e) {
-        if (!timerRunning && time > 0) {
-            setTimerRunning(true);
-        }
-        if (
-            !wordList.length ||
-            currentWordIndex >= wordList.length ||
-            time <= 0
-        )
-            return;
-
         const functionalKeys = [
             "Shift",
             "Control",
@@ -167,14 +159,25 @@ const Gameboard = (props) => {
             "ArrowDown",
             "ArrowLeft",
             "ArrowRight",
-            "Backspace",
             "Delete",
             "NumLock",
         ];
+        if (functionalKeys.includes(e.key)) {
+            e.preventDefault();
+            return;
+        }
 
-        const isFirst = document.querySelector(".firstLetter");
-        if (isFirst && !functionalKeys.includes(e.key)) {
+        if (!timerRunning && time > 0 && e.key.length === 1 && e.key !== " ") {
+            setTimerRunning(true);
             startTimer();
+        }
+
+        if (
+            !wordList.length ||
+            currentWordIndex >= wordList.length ||
+            time <= 0
+        ) {
+            return;
         }
 
         const currentWord = wordList[currentWordIndex].split("");
@@ -184,20 +187,26 @@ const Gameboard = (props) => {
         const isBackspace = e.key === "Backspace";
 
         let newLetterStates = [...letterStates];
-        let newFirstAttemptStates = [...firstAttemptStates]; // Track first attempts for accuracy
+        let newFirstAttemptStates = [...firstAttemptStates];
+        let newWrongSpaces = [...wrongSpaces];
 
         if (!newLetterStates[currentWordIndex]) {
-            newLetterStates[currentWordIndex] = [];
+            newLetterStates[currentWordIndex] = new Array(
+                currentWord.length
+            ).fill("");
         }
         if (!newFirstAttemptStates[currentWordIndex]) {
-            newFirstAttemptStates[currentWordIndex] = [];
+            newFirstAttemptStates[currentWordIndex] = new Array(
+                currentWord.length
+            ).fill(undefined);
+        }
+        if (!newWrongSpaces[currentWordIndex]) {
+            newWrongSpaces[currentWordIndex] = false;
         }
 
         if (isLetter) {
-            if (currentLetter) {
+            if (currentLetterIndex < currentWord.length) {
                 const isCorrect = e.key === currentLetter;
-                const currentState =
-                    newLetterStates[currentWordIndex][currentLetterIndex];
                 const hasBeenAttempted =
                     newFirstAttemptStates[currentWordIndex][
                         currentLetterIndex
@@ -208,57 +217,61 @@ const Gameboard = (props) => {
                         currentLetterIndex
                     ] = isCorrect ? "correct" : "incorrect";
                 }
-
                 newLetterStates[currentWordIndex][currentLetterIndex] =
                     isCorrect ? "correct" : "incorrect";
                 setCurrentLetterIndex((prev) => prev + 1);
-            } else {
-                const extraIndex = newLetterStates[currentWordIndex].length;
-                newLetterStates[currentWordIndex].push("extra");
-                newFirstAttemptStates[currentWordIndex][extraIndex] = "extra";
             }
-        }
-
-if (isSpace) {
-    if (currentWordIndex < wordList.length) {
-        for (let i = currentLetterIndex; i < currentWord.length; i++) {
-            if (!newLetterStates[currentWordIndex][i]) {
-                newLetterStates[currentWordIndex][i] = "missed";
-                newFirstAttemptStates[currentWordIndex][i] = "missed";
+        } else if (isSpace) {
+            if (currentLetterIndex === 0) {
+                return;
             }
-        }
-
-        setCurrentWordIndex((prev) => prev + 1);
-        setCurrentLetterIndex(0);
-    }
-}
-
-
-        if (isBackspace) {
+            else {
+                if (currentLetterIndex < currentWord.length) {
+                    newWrongSpaces[currentWordIndex] = true;
+                    for (let i = currentLetterIndex; i < currentWord.length; i++) {
+                        if (newFirstAttemptStates[currentWordIndex][i] === undefined) {
+                            newFirstAttemptStates[currentWordIndex][i] = "missed";
+                        }
+                        newLetterStates[currentWordIndex][i] = "missed";
+                    }
+                }
+                setCurrentWordIndex((prev) => prev + 1);
+                setCurrentLetterIndex(0);
+            }
+        }else if (isBackspace) {
             if (currentLetterIndex > 0) {
                 const prevIndex = currentLetterIndex - 1;
-
-                if (newLetterStates[currentWordIndex][prevIndex] === "extra") {
-                    newLetterStates[currentWordIndex].splice(prevIndex, 1);
-                    newFirstAttemptStates[currentWordIndex].splice(
-                        prevIndex,
-                        1
-                    );
-                } else {
-                    newLetterStates[currentWordIndex][prevIndex] = "";
-                }
-
+                newLetterStates[currentWordIndex][prevIndex] = "";
                 setCurrentLetterIndex((prev) => prev - 1);
             } else if (currentWordIndex > 0) {
-                const prevWordCorrect = isWordCorrect(currentWordIndex - 1);
-                if (prevWordCorrect) return;
+                const prevWordIndex = currentWordIndex - 1;
+                const prevWordCompleted =
+                    newLetterStates[prevWordIndex]?.every(
+                        (status, index) =>
+                            status === "correct" ||
+                            wordList[prevWordIndex][index] === undefined
+                    ) && !newWrongSpaces[prevWordIndex];
 
+                if (prevWordCompleted) {
+                    return;
+                }
+
+                const previousWordElement =
+                    document.querySelectorAll(".word")[prevWordIndex];
                 const currentWordElement =
                     document.querySelectorAll(".word")[currentWordIndex];
-                const previousWordElement =
-                    document.querySelectorAll(".word")[currentWordIndex - 1];
 
-                if (previousWordElement && currentWordElement) {
+                // Heuristic for line breaks to decide if backspace should go to previous line
+                // This part is highly dependent on your CSS and layout.
+                // The existing logic seems to attempt to determine if the previous word is
+                // on the same visual line or an immediately preceding visible line.
+                // If the element references are not reliable or lead to unexpected behavior,
+                // you might need to adjust this based on your rendering.
+                if (
+                    previousWordElement &&
+                    currentWordElement &&
+                    gameRef.current
+                ) {
                     const gameBoxRect = gameRef.current.getBoundingClientRect();
                     const previousWordRect =
                         previousWordElement.getBoundingClientRect();
@@ -278,46 +291,32 @@ if (isSpace) {
                         setCurrentWordIndex((prev) => prev - 1);
 
                         const prevWordStates =
-                            newLetterStates[currentWordIndex - 1] || [];
+                            newLetterStates[prevWordIndex] || [];
                         let lastTypedIndex = prevWordStates.length;
 
+                        // Find the last typed character that is not empty or missed
                         while (
                             lastTypedIndex > 0 &&
-                            prevWordStates[lastTypedIndex - 1] === "missed"
+                            (prevWordStates[lastTypedIndex - 1] === "missed" ||
+                                prevWordStates[lastTypedIndex - 1] === "")
                         ) {
-                            newLetterStates[currentWordIndex - 1][
-                                lastTypedIndex - 1
-                            ] = "";
-                            newFirstAttemptStates[currentWordIndex - 1][
-                                lastTypedIndex - 1
-                            ] = undefined;
+                            newLetterStates[prevWordIndex][lastTypedIndex - 1] =
+                                ""; // Clear for display
                             lastTypedIndex--;
                         }
-
                         setCurrentLetterIndex(lastTypedIndex);
                     }
                 }
             }
         }
         console.log(newLetterStates);
+        console.log(newFirstAttemptStates);
+        console.log(newWrongSpaces);
 
         setLetterStates(newLetterStates);
         setFirstAttemptStates(newFirstAttemptStates);
+        setWrongSpaces(newWrongSpaces);
     }
-
-    // function updateCursorPosition(){
-    //   const wordElement = document.querySelector(".word.current");
-    //   const letterElement = document.querySelector(".letter.current");
-
-    //   if(letterElement){
-    //     const rect = letterElement.getBoundingClientRect();
-    //     //console.log(rect);
-    //     setCursorPosition({top: rect.top,left: rect.left});
-    //   }else if(wordElement){
-    //     const rect = wordElement.getBoundingClientRect();
-    //     setCursorPosition({top: rect.top,left: rect.right});
-    //   }else return;
-    // }
 
     function adjustWordsPosition() {
         if (!wordsContainerRef.current) return;

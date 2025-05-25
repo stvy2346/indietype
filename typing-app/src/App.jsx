@@ -30,7 +30,8 @@ function App() {
     );
     const [timerRunning, setTimerRunning] = useState(false);
     const [letterStates, setLetterStates] = useState([]);
-    const [firstAttemptStates,setFirstAttemptStates] = useState([]);
+    const [firstAttemptStates, setFirstAttemptStates] = useState([]);
+    const [wrongSpaces,setWrongSpaces] = useState([]);
     const [timerVisible, setTimerVisible] = useState(false);
     const [animate, setAnimate] = useState(false);
     const [isCapsLockOn, setIsCapsLockOn] = useState(false);
@@ -132,115 +133,106 @@ function App() {
     //   return ((correct/(correct+incorrect))*100).toFixed(2);
     // }
 
-    function getTypingStats() {
-        let correctChars = 0;
-        let incorrectChars = 0;
-        let extraChars = 0;
-        let missedChars = 0;
-        let correctWords = 0;
-        let totalWords = 0;
 
-        const completedWordCount = Math.min(currentWordIndex, wordList.length);
+function getTypingStats() {
+    let correctChars = 0;
+    let incorrectChars = 0;
+    let missedChars = 0;
+    let correctWords = 0;
+    let totalWords = 0;
+    let wrongSpaceCount = 0;
 
-        for (let wordIndex = 0; wordIndex < completedWordCount; wordIndex++) {
-            const originalWord = wordList[wordIndex];
-            const firstAttempts = firstAttemptStates[wordIndex] || [];
-            const currentStates = letterStates[wordIndex] || [];
+    const completedWordCount = Math.min(currentWordIndex, wordList.length);
 
-            if (firstAttempts.length === 0) continue; // Word never attempted
+    for (let wordIndex = 0; wordIndex < completedWordCount; wordIndex++) {
+        const originalWord = wordList[wordIndex];
+        const firstAttempts = firstAttemptStates[wordIndex] || [];
+        const hasWrongSpace = wrongSpaces[wordIndex] || false;
 
-            let wordHasError = false;
-            let wordCompleted = false;
+        const wordWasAttempted = firstAttempts.some(attempt => attempt !== undefined) || hasWrongSpace;
 
-            for (
-                let charIndex = 0;
-                charIndex < originalWord.length;
-                charIndex++
-            ) {
-                const firstAttempt = firstAttempts[charIndex];
+        if (!wordWasAttempted && originalWord.length === 0) continue;
 
-                if (firstAttempt === "correct") {
-                    correctChars++;
-                } else if (firstAttempt === "incorrect") {
-                    incorrectChars++;
-                    wordHasError = true;
-                } else if (firstAttempt === "missed") {
-                    missedChars++;
-                    wordHasError = true;
-                }
-            }
 
-            for (let i = originalWord.length; i < firstAttempts.length; i++) {
-                if (firstAttempts[i] === "extra") {
-                    extraChars++;
-                    wordHasError = true;
-                }
-            }
-
-            const wordTypedLength = Math.min(
-                firstAttempts.length,
-                originalWord.length
-            );
-            const allCorrect = firstAttempts
-                .slice(0, originalWord.length)
-                .every((state) => state === "correct");
-            const rightLength =
-                firstAttempts.filter((state) => state !== "extra").length ===
-                originalWord.length;
-
-            wordCompleted = wordTypedLength === originalWord.length;
-
-            if (wordCompleted && allCorrect && rightLength && !wordHasError) {
-                correctWords++;
-            }
-
-            totalWords++;
+        if (hasWrongSpace) {
+            wrongSpaceCount++;
         }
 
-        const elapsedTime = Math.max(initialTime - time, 1); // Prevent division by zero
-        const timeInMinutes = elapsedTime / 60;
+        for (
+            let charIndex = 0;charIndex < originalWord.length;charIndex++) {
+            const firstAttempt = firstAttempts[charIndex];
 
-        const totalTypedChars = correctChars + incorrectChars;
+            if (firstAttempt === "correct") {
+                correctChars++;
+            } else if (firstAttempt === "incorrect") {
+                incorrectChars++;
+            } else if (firstAttempt === "missed") {
+                missedChars++;
+            } else if (firstAttempt === undefined) {
+                missedChars++;
+            }
+        }
 
-        const wpm =
-            timeInMinutes > 0
-                ? Math.round(correctChars / 5 / timeInMinutes)
-                : 0;
+        const allCharactersCorrectInFirstAttempt = originalWord
+            .split("")
+            .every((_, index) => firstAttempts[index] === "correct");
 
-        const rawWpm =
-            timeInMinutes > 0
-                ? Math.round(totalTypedChars / 5 / timeInMinutes)
-                : 0;
+        if (allCharactersCorrectInFirstAttempt && !hasWrongSpace) {
+            correctWords++;
+        }
 
-        const accuracy =
-            totalTypedChars > 0
-                ? ((correctChars / totalTypedChars) * 100).toFixed(2)
-                : "100.00";
-
-        const allCharsAttempted =
-            correctChars + incorrectChars + extraChars + missedChars;
-        const rawAccuracy =
-            allCharsAttempted > 0
-                ? ((correctChars / allCharsAttempted) * 100).toFixed(2)
-                : "100.00";
-
-        return {
-            wpm,
-            rawWpm,
-            accuracy: parseFloat(accuracy),
-            rawAccuracy: parseFloat(rawAccuracy),
-            correctChars,
-            incorrectChars,
-            extraChars,
-            missedChars,
-            correctWords,
-            totalWords,
-            elapsedTime,
-            timeInMinutes,
-            totalTypedChars,
-        };
+        totalWords++;
     }
 
+    const elapsedTime = Math.max(initialTime - time, 1);
+    const timeInMinutes = elapsedTime / 60;
+
+    const totalTypedChars = correctChars + incorrectChars;
+    const totalPossibleChars = correctChars + incorrectChars + missedChars;
+
+    const netWPM =
+        timeInMinutes > 0
+            ? Math.round(correctChars / 5 / timeInMinutes)
+            : 0;
+
+    const grossWPM =
+        timeInMinutes > 0
+            ? Math.round(totalTypedChars / 5 / timeInMinutes)
+            : 0;
+
+    const netAccuracy =
+        totalPossibleChars > 0
+            ? ((correctChars / totalPossibleChars) * 100).toFixed(2)
+            : "100.00";
+
+    const grossAccuracy =
+        totalTypedChars > 0
+            ? ((correctChars / totalTypedChars) * 100).toFixed(2)
+            : "100.00";
+
+
+    const totalErrors = incorrectChars + missedChars + wrongSpaceCount;
+
+
+    return {
+        wpm: netWPM,
+        rawWpm: grossWPM,
+        accuracy: parseFloat(netAccuracy),
+        rawAccuracy: parseFloat(grossAccuracy),
+        correctChars,
+        incorrectChars,
+        extraChars: 0,
+        missedChars,
+        wrongSpaces: wrongSpaceCount,
+        correctWords,
+        totalWords,
+        elapsedTime,
+        timeInMinutes,
+        totalTypedChars,
+        totalPossibleChars,
+        totalErrors,
+    };
+}
 
     useEffect(() => {
         if (time > 0 && timerRunning) {
@@ -310,6 +302,8 @@ function App() {
                         setLetterStates={setLetterStates}
                         firstAttemptStates={firstAttemptStates}
                         setFirstAttemptStates={setFirstAttemptStates}
+                        wrongSpaces={wrongSpaces}
+                        setWrongSpaces={setWrongSpaces}
                         currentWordIndex={currentWordIndex}
                         currentLetterIndex={currentLetterIndex}
                         setCurrentWordIndex={setCurrentWordIndex}
