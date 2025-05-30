@@ -30,9 +30,9 @@ function App() {
     );
     const [timerRunning, setTimerRunning] = useState(false);
     const [letterStates, setLetterStates] = useState([]);
+    const [firstAttemptStates, setFirstAttemptStates] = useState([]);
+    const [wrongSpaces, setWrongSpaces] = useState([]);
     const [timerVisible, setTimerVisible] = useState(false);
-    const [correct, setCorrect] = useState(0);
-    const [incorrect, setIncorrect] = useState(0);
     const [animate, setAnimate] = useState(false);
     const [isCapsLockOn, setIsCapsLockOn] = useState(false);
 
@@ -68,8 +68,6 @@ function App() {
         setTimerRunning(false);
         setTimerVisible(false);
         setTime(initialTime);
-        setCorrect(0);
-        setIncorrect(0);
     };
 
     const handleRestart = () => {
@@ -120,83 +118,113 @@ function App() {
         };
     }, []);
 
-    // function getWPM(){
-    //   const correctWords = letterStates.filter((wordState)=>{
-    //       return wordState && wordState.every((letterState) => letterState === "correct");
-    //   }).length;
-    //   return correctWords > 1 ? Math.round((correctWords) * ((60)/initialTime)) : 0;
-    // }
-
-    // function getRawSpeed(){
-    //   return currentWordIndex > 1 ? Math.round(currentWordIndex * ((60)/initialTime)) : 0;
-    // }
-
-    // function getAccuracy(){
-    //   return ((correct/(correct+incorrect))*100).toFixed(2);
-    // }
 
     function getTypingStats() {
         let correctChars = 0;
         let incorrectChars = 0;
-        let skippedChars = 0;
-        let spaces = 0;
+        let missedChars = 0;
         let correctWords = 0;
-        let incorrectWords = 0;
+        let totalWords = 0;
+        let wrongSpaceCount = 0;
 
-        spaces = currentWordIndex > 0 ? currentWordIndex - 1 : 0;
+        const wordsToProcessCount = currentWordIndex + 1;
 
-        letterStates.forEach((wordState) => {
-            if (!wordState) return;
+        for (let wordIndex = 0; wordIndex < wordsToProcessCount; wordIndex++) {
+            const originalWord = wordList[wordIndex];
+            const firstAttempts = firstAttemptStates[wordIndex] || [];
+            const hasWrongSpace = wrongSpaces[wordIndex] || false;
 
-            let wordCorrect = true;
+            const wordWasAttempted =
+                firstAttempts.some((attempt) => attempt !== undefined) ||
+                hasWrongSpace;
 
-            wordState.forEach((letterState) => {
-                if (letterState === "correct") {
-                    correctChars++;
-                } else if (letterState === "incorrect") {
-                    incorrectChars++;
-                    wordCorrect = false;
-                } else if (letterState === "skipped") {
-                    skippedChars++;
-                    wordCorrect = false;
-                }
-            });
+            if (!wordWasAttempted && originalWord.length === 0) continue;
 
-            if (wordCorrect && wordState.length > 0) {
-                correctWords++;
-            } else if (!wordCorrect) {
-                incorrectWords++;
+            if (hasWrongSpace) {
+                wrongSpaceCount++;
             }
-        });
+            const charsToProcess =
+                wordIndex === currentWordIndex
+                    ? Math.min(currentLetterIndex, originalWord.length) // Only characters typed so far
+                    : originalWord.length;
 
-        const wpm =
-            correctChars > 5
-                ? Math.round((correctChars / 5) * (60 / initialTime))
+            for (let charIndex = 0; charIndex < charsToProcess; charIndex++) {
+                const firstAttempt = firstAttempts[charIndex];
+
+                if (firstAttempt === "correct") {
+                    correctChars++;
+                } else if (firstAttempt === "incorrect") {
+                    incorrectChars++;
+                } else if (firstAttempt === "missed") {
+                    missedChars++;
+                } else if (firstAttempt === undefined) {
+                    missedChars++;
+                }
+            }
+
+            if (wordIndex < currentWordIndex) {
+                const allCharactersCorrectInFirstAttempt = originalWord
+                    .split("")
+                    .every((_, index) => firstAttempts[index] === "correct");
+
+                if (allCharactersCorrectInFirstAttempt && !hasWrongSpace) {
+                    correctWords++;
+                }
+                totalWords++; 
+            } else if (wordIndex === currentWordIndex) {
+                if (currentLetterIndex > 0 || hasWrongSpace) {
+                    totalWords++;
+                }
+            }
+
+            totalWords++;
+        }
+
+        const elapsedTime = Math.max(initialTime - time, 1);
+        const timeInMinutes = elapsedTime / 60;
+
+        const totalTypedChars = correctChars + incorrectChars;
+        const totalPossibleChars = correctChars + incorrectChars + missedChars;
+
+        const netWPM =
+            timeInMinutes > 0
+                ? Math.round(correctChars / 5 / timeInMinutes)
                 : 0;
 
-        const rawSpeed =
-            correctChars + incorrectChars > 5
-                ? Math.round(
-                      ((correctChars + incorrectChars) / 5) * (60 / initialTime)
-                  )
+        const grossWPM =
+            timeInMinutes > 0
+                ? Math.round(totalTypedChars / 5 / timeInMinutes)
                 : 0;
 
-        const totalAttempted = correctChars + incorrectChars;
-        const accuracy =
-            totalAttempted > 0
-                ? ((correctChars / totalAttempted) * 100).toFixed(2)
+        const netAccuracy =
+            totalPossibleChars > 0
+                ? ((correctChars / totalPossibleChars) * 100).toFixed(2)
                 : "100.00";
 
+        const grossAccuracy =
+            totalTypedChars > 0
+                ? ((correctChars / totalTypedChars) * 100).toFixed(2)
+                : "100.00";
+
+        const totalErrors = incorrectChars + missedChars + wrongSpaceCount;
+
         return {
-            wpm,
-            rawSpeed,
-            accuracy,
+            wpm: netWPM,
+            rawWpm: grossWPM,
+            accuracy: parseFloat(netAccuracy),
+            rawAccuracy: parseFloat(grossAccuracy),
             correctChars,
             incorrectChars,
-            skippedChars,
-            spaces,
+            extraChars: 0,
+            missedChars,
+            wrongSpaces: wrongSpaceCount,
             correctWords,
-            incorrectWords,
+            totalWords,
+            elapsedTime,
+            timeInMinutes,
+            totalTypedChars,
+            totalPossibleChars,
+            totalErrors,
         };
     }
 
@@ -253,7 +281,9 @@ function App() {
                         <div className="absolute flex left-1/2 transform -translate-x-1/2 bg-[var(--settingBg)] px-5 py-3 rounded-md text-[var(--text-active)]">
                             <div className="flex items-center gap-2">
                                 <FaLock />
-                                <span className="transform translate-y-[1px]">Caps Lock</span>
+                                <span className="transform translate-y-[1px]">
+                                    Caps Lock
+                                </span>
                             </div>
                         </div>
                     )}
@@ -264,6 +294,10 @@ function App() {
                         setWordList={setWordList}
                         letterStates={letterStates}
                         setLetterStates={setLetterStates}
+                        firstAttemptStates={firstAttemptStates}
+                        setFirstAttemptStates={setFirstAttemptStates}
+                        wrongSpaces={wrongSpaces}
+                        setWrongSpaces={setWrongSpaces}
                         currentWordIndex={currentWordIndex}
                         currentLetterIndex={currentLetterIndex}
                         setCurrentWordIndex={setCurrentWordIndex}
@@ -272,10 +306,6 @@ function App() {
                         //theme={theme}
                         startTimer={startTimer}
                         time={time}
-                        correct={correct}
-                        setCorrect={setCorrect}
-                        incorrect={incorrect}
-                        setIncorrect={setIncorrect}
                         timerRunning={timerRunning}
                         setTimerRunning={setTimerRunning}
                         animate={animate}
