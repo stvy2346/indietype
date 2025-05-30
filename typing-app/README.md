@@ -1,12 +1,33 @@
-# React + Vite
+# 🇮🇳 IndieType
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**IndieType** is a fun and fast-paced typing speed test platform where users can practice typing in Indian languages (like Hindi, Marathi, Bengali — in Latin script) as well as Gen Z flavors like Weeb-speak and Brainrot. Built for multilingual internet users who want to type fast *and* chaotically.
 
-Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Expanding the ESLint configuration
+## 📸 Demo
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+![IndieType Demo](indietype.png)  
+
+
+## 🛠️ Tech Stack
+
+- **Frontend:** [React](https://reactjs.org/), [TailwindCSS](https://tailwindcss.com/)
+- **Backend:** Private / Internal (not part of this repository)
+
+
+## 📦 Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/stvy2346/indietype.git
+cd brainrot-convertor
+
+# Install frontend dependencies
+npm install
+
+# Start the development server
+npm run dev
+```
+
+## 🌐 Live
+🚀[Check out the live version here](https://indietype.netlify.app/)
