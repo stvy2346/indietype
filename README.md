@@ -12,7 +12,6 @@
 ## 🛠️ Tech Stack
 
 - **Frontend:** [React](https://reactjs.org/), [TailwindCSS](https://tailwindcss.com/)
-- **Backend:** Private / Internal (not part of this repository)
 
 
 ## 📦 Installation
@@ -24,6 +23,9 @@ cd brainrot-convertor
 
 # Install frontend dependencies
 npm install
+
+# Switch folder
+cd typing-app
 
 # Start the development server
 npm run dev
