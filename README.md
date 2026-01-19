@@ -19,13 +19,12 @@
 ```bash
 # Clone the repository
 git clone https://github.com/stvy2346/indietype.git
-cd brainrot-convertor
-
-# Install frontend dependencies
-npm install
 
 # Switch folder
 cd typing-app
+
+# Install frontend dependencies
+npm install
 
 # Start the development server
 npm run dev
